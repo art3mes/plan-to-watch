@@ -22,10 +22,10 @@ file per poster.
 ```bash
 cp .env.production.example .env.production   # first time only
 pnpm anime:check                             # chunks and atlases must agree
-pnpm deploy                                  # build, check file count, upload
+pnpm run deploy                                  # build, check file count, upload
 ```
 
-`pnpm deploy` refuses to upload if `dist/` is over the file limit, so the
+`pnpm run deploy` refuses to upload if `dist/` is over the file limit, so the
 failure is a message rather than a rejected deploy.
 
 The first run prompts to create the Pages project, and `pnpm wrangler login`
@@ -54,7 +54,7 @@ Both halves are indexed by wall position and must move together.
 pnpm anime:kitsu && pnpm anime:mal && pnpm anime:popularity   # refresh sources
 pnpm anime:order && pnpm anime:posters && pnpm anime:atlases  # rebuild
 pnpm anime:check                                              # fingerprints agree
-pnpm deploy
+pnpm run deploy
 ```
 
 `pnpm anime:atlases --sheets-only` rebuilds just the poster sheets, leaving the
