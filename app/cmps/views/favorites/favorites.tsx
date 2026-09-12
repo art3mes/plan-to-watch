@@ -74,7 +74,7 @@ export const Favorites = () => {
                   className='relative flex h-36 w-full cursor-auto flex-row overflow-hidden rounded-xl border'
                   key={key}
                 >
-                  <FilmPoster film={film} />
+                  <FilmPoster film={film} className='h-full' />
                   <div className='flex h-full grow flex-col justify-between gap-3 p-4'>
                     <h6 className='pr-3 font-black text-2xl leading-none'>
                       {film.title}

@@ -30,7 +30,13 @@ const VERSIONS = [
   { name: 'mid', cols: 90, rows: 60, width: 1980, height: 1980 },
   { name: 'high', cols: 18, rows: 12, width: 1980, height: 1980 },
 ]
+// Detail-panel posters are packed into sheets rather than written one file
+// per title: 21,472 individual jpegs put the deployment over Cloudflare Pages'
+// 20,000 file limit. 9x6 of 220x330 fills the same 1980x1980 as the atlases.
 const SINGLE = { width: 220, height: 330, quality: 82 }
+const SHEET = { cols: 9, rows: 6, width: 1980, height: 1980, quality: 82 }
+SHEET.perSheet = SHEET.cols * SHEET.rows
+const SHEETS_ONLY = process.argv.includes('--sheets-only')
 
 const ordered = JSON.parse(readFileSync(resolve(root, 'data/build/ordered.json'), 'utf8'))
 const total = ordered.length
@@ -41,8 +47,15 @@ const clearDir = (dir, pattern) => {
 }
 
 for (const v of VERSIONS) {
-  clearDir(resolve(MEDIA_DIR, v.name, 'dds'), /\.dds$/)
-  clearDir(resolve(MEDIA_DIR, v.name, 'ktx'), /\.ktx$/)
+  // --sheets-only must not touch the atlases: clearing them here without
+  // writing them back is how a "quick" sheet rebuild deleted 390MB of layers.
+  if (SHEETS_ONLY) {
+    mkdirSync(resolve(MEDIA_DIR, v.name, 'dds'), { recursive: true })
+    mkdirSync(resolve(MEDIA_DIR, v.name, 'ktx'), { recursive: true })
+  } else {
+    clearDir(resolve(MEDIA_DIR, v.name, 'dds'), /.dds$/)
+    clearDir(resolve(MEDIA_DIR, v.name, 'ktx'), /.ktx$/)
+  }
   v.tileWidth = Math.floor(v.width / v.cols)
   v.tileHeight = Math.floor(v.height / v.rows)
   v.perLayer = v.cols * v.rows
@@ -50,7 +63,18 @@ for (const v of VERSIONS) {
   v.canvas = Buffer.alloc(v.width * v.height * 3) // current layer, black
   v.current = 0
 }
-clearDir(resolve(MEDIA_DIR, 'single'), /\.jpg$/)
+const sheetDir = resolve(MEDIA_DIR, 'poster-sheets')
+clearDir(sheetDir, /.jpg$/)
+const sheetCanvas = Buffer.alloc(SHEET.width * SHEET.height * 3)
+const sheetCount = Math.ceil(total / SHEET.perSheet)
+
+/** Flush the current sheet to disk and clear it for the next batch. */
+const writeSheet = async (index) => {
+  await sharp(sheetCanvas, { raw: { width: SHEET.width, height: SHEET.height, channels: 3 } })
+    .jpeg({ quality: SHEET.quality, progressive: true })
+    .toFile(resolve(sheetDir, `${index}.jpg`))
+  sheetCanvas.fill(0)
+}
 
 const writeLayer = (v, layer) => {
   const dds = writeDDS(v.width, v.height, encodeDXT1(v.canvas, v.width, v.height))
@@ -124,22 +148,23 @@ for (let position = 0; position < total; position++) {
   const fromBase = () => sharp(base, { raw: { width: SINGLE.width, height: SINGLE.height, channels: 3 } })
 
   for (const v of VERSIONS) {
-    if (base) {
+    if (base && !SHEETS_ONLY) {
       const tile = await fromBase().resize(v.tileWidth, v.tileHeight, { fit: 'fill' }).raw().toBuffer()
       blit(v.canvas, v.width, tile, v.tileWidth, v.tileHeight, position % v.perLayer, v.cols)
     }
     // layer complete (or this is the very last poster) - encode and flush
-    if (position % v.perLayer === v.perLayer - 1 || position === total - 1) {
+    if (!SHEETS_ONLY && (position % v.perLayer === v.perLayer - 1 || position === total - 1)) {
       bytes += writeLayer(v, Math.floor(position / v.perLayer))
     }
   }
 
   if (base) {
-    await withRetry(`single/${position}.jpg`, () =>
-      fromBase()
-        .jpeg({ quality: SINGLE.quality, progressive: true })
-        .toFile(resolve(MEDIA_DIR, 'single', `${position}.jpg`)),
-    )
+    const slot = position % SHEET.perSheet
+    blit(sheetCanvas, SHEET.width, base, SINGLE.width, SINGLE.height, slot, SHEET.cols)
+  }
+  if (position % SHEET.perSheet === SHEET.perSheet - 1 || position === total - 1) {
+    const index = Math.floor(position / SHEET.perSheet)
+    await withRetry(`poster-sheets/${index}.jpg`, () => writeSheet(index))
   }
 
   if (position % 250 === 0 || position === total - 1) {
@@ -160,5 +185,6 @@ writeFileSync(
   }),
 )
 
+console.log(`poster sheets: ${sheetCount} files of ${SHEET.cols}x${SHEET.rows}`)
 console.log('layer counts for .env.local:')
 VERSIONS.forEach((v, i) => console.log(`  VITE_MEDIA_VERSION_${i}_LAYERS=${v.layers}`))

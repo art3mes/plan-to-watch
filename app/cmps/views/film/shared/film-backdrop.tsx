@@ -1,19 +1,11 @@
-import config from '@/config'
-import type { Film } from '@/vf/utils'
+import { type Film, posterStyle } from '@/vf'
 
-// There are no separate backdrop images for anime, so the poster stands in.
+// There are no backdrop images for anime, so the poster stands in.
 export const FilmBackdrop = ({ film }: { film: Film }) => {
   return (
-    <img
-      src={`${config.posterBaseUrl}${film.poster}`}
-      alt=''
-      className='h-auto w-full'
+    <div
+      style={posterStyle(film.posterRef)}
+      className='aspect-[2/3] h-auto w-full bg-no-repeat'
     />
   )
 }
-// background - position
-// : calc((((100vw / 2.222222) - 20px) / 1.5) / 2) 0
-// background - image
-// : url('https://media.themoviedb.org/t/p/w1000_and_h450_multi_faces/uxQW0C3TkbasUJbShlFTnvaaZP4.jpg')
-// background-size: cover;
-// background-repeat: no-repeat;

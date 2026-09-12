@@ -35,7 +35,7 @@ export type UserConfig = {
       malId?: Film['malId']
       anilistId?: Film['anilistId']
       kitsuId?: Film['kitsuId']
-      poster?: Film['poster']
+      posterRef?: Film['posterRef']
     }
   }
 }

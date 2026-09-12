@@ -1,8 +1,11 @@
-import { type PointerEventHandler, useState } from 'react'
-import config from '../../../../config'
+import type { PointerEventHandler } from 'react'
 import { cn } from '../../../../utils/tw'
-import type { Film } from '../../../../vf'
+import { type Film, posterStyle } from '../../../../vf'
 
+/**
+ * One poster, cropped out of its sheet. Posters are packed 9x6 per sheet, so
+ * this is a background-position offset rather than its own image request.
+ */
 export const FilmPoster = ({
   film,
   onPointerOver,
@@ -10,26 +13,18 @@ export const FilmPoster = ({
 }: {
   film: {
     title: Film['title']
-    poster?: Film['poster']
+    posterRef?: Film['posterRef']
   }
-  onPointerOver?: PointerEventHandler<HTMLImageElement>
+  onPointerOver?: PointerEventHandler<HTMLDivElement>
   className?: string
 }) => {
-  const [hidden, setHidden] = useState(true)
+  if (!film.posterRef) return null
   return (
-    <img
-      src={`${config.posterBaseUrl}${film.poster}`}
-      crossOrigin='anonymous'
-      alt={film.title}
-      className={cn('', className, {
-        '!w-0 !h-0 !aspect-none !basis-0': hidden,
-      })}
-      onLoad={() => {
-        setHidden(false)
-      }}
-      onError={() => {
-        setHidden(true)
-      }}
+    <div
+      role='img'
+      aria-label={film.title}
+      style={posterStyle(film.posterRef)}
+      className={cn('aspect-[2/3] bg-no-repeat', className)}
       onPointerOver={onPointerOver}
     />
   )

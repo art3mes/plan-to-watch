@@ -87,7 +87,7 @@ export const FilmViewFooter = ({
                       title: film.title,
                       alt: film.alt,
                       year: film.year,
-                      poster: film.poster,
+                      posterRef: film.posterRef,
                     }
                   }
                   setUserConfig(userConfig)

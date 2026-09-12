@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import config from '../../../../../config'
 import { useMediaQuery } from '../../../../../hooks/use-media-query'
 import { store } from '../../../../../store'
 import { down, orientation } from '../../../../../utils/mq'
 import { cn } from '../../../../../utils/tw'
-import type { Film } from '../../../../../vf'
+import { type Film, posterStyle } from '../../../../../vf'
 import { AnimateDimensionsChange } from '../../../../common/animate-dimensions-change'
 import { Badge } from '../../../../ui/badge'
 import { FilmRatingGauge } from '../../shared/film-rating-gauge'
@@ -21,7 +20,7 @@ export const FilmView = ({
   const ua = store((state) => state.ua)
 
   const [backdropHidden, setBackdropHidden] = useState(true)
-  const [backdropErrored, setBackdropErrored] = useState(true)
+  const [backdropErrored] = useState(false)
 
   useEffect(() => {
     if (filmRef.current?.cellId !== film?.cellId) {
@@ -58,25 +57,19 @@ export const FilmView = ({
           )}
         >
           {!isIOS && (
-            <img
+            <div
               className={cn(
-                'h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 will-change-[opacity]',
+                'h-full w-full bg-no-repeat opacity-0 transition-opacity duration-500 will-change-[opacity]',
                 {
-                  '!w-0 !h-0': backdropErrored,
                   '!opacity-60 dark:!opacity-60': !backdropHidden,
                 },
               )}
-              alt=''
               // no anime backdrops exist, so the poster is blurred and
               // over-scaled to fill the panel behind the text
-              style={{ filter: 'blur(24px)', transform: 'scale(1.2)' }}
-              src={`${config.posterBaseUrl}${film.poster}`}
-              onLoad={() => {
-                setBackdropHidden(false)
-                setBackdropErrored(false)
-              }}
-              onError={() => {
-                setBackdropErrored(true)
+              style={{
+                ...posterStyle(film.posterRef),
+                filter: 'blur(24px)',
+                transform: 'scale(1.2)',
               }}
             />
           )}

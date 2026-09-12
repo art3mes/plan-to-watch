@@ -50,6 +50,9 @@ Key invariants:
 - Json chunks hold 216 titles, matching one high-res atlas page and one lattice subgrid. Position 0 is the centre of the wall.
 - Order is each franchise's most popular entry first (MAL member count), then all remaining sequels and films.
 - After `anime:atlases`, update `VITE_MEDIA_VERSION_*_LAYERS` in `.env.local` with the layer counts it prints.
+- Detail-panel posters are packed 9x6 into sheets under `public/media/poster-sheets/`, not one file per title: 21,472 individual images exceed Cloudflare Pages' 20,000 file limit on their own. `posterStyle()` in `app/vf/utils/films.ts` crops one out with `background-position`; the geometry must match `SHEET` in step 7.
+- The experimental full-resolution texture layer (`VITE_EXPERIMENTAL_MEDIA_VERSION_3_ENABLED`) wants one image per title and is therefore off. The deepest zoom uses the high atlas instead.
+- `pnpm anime:atlases --sheets-only` rebuilds sheets without re-encoding the 105 atlas layers.
 
 ### Texture encoding
 
@@ -67,7 +70,7 @@ The ETC selector bit mapping is `(msb,lsb)`: `(0,0)` = small positive, `(1,1)` =
 
 ### Film data shape
 
-`Film` carries `malId`/`anilistId`/`kitsuId`, `title` (English where available, else romaji), `alt` (the other spellings), `synopsis`, `type`, `episodes`, `studios`, `genres`, `rating` (0-100, MAL first), `ageRating` and `poster`. There are **no backdrop images** - the detail panel blurs the poster instead. Favourites are keyed by `favoriteKey()` so rebuilt data does not orphan them.
+`Film` carries `posterRef` (sheet index plus column/row), `malId`/`anilistId`/`kitsuId`, `title` (English where available, else romaji), `alt` (the other spellings), `synopsis`, `type`, `episodes`, `studios`, `genres`, `rating` (0-100, MAL first), `ageRating` and `poster`. There are **no backdrop images** - the detail panel blurs the poster instead. Favourites are keyed by `favoriteKey()` so rebuilt data does not orphan them.
 
 ## Code style
 

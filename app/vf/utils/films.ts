@@ -1,4 +1,31 @@
+import type { CSSProperties } from 'react'
+import config from '../../config'
 import type { VoroforceCell } from '../types'
+
+// Posters live in sheets of 9x6 rather than one file per title - 21,472
+// separate images would put the deployment over Cloudflare Pages' file limit.
+// Must match SHEET in scripts/anime/07-build-atlases.mjs.
+export const SHEET_COLS = 9
+export const SHEET_ROWS = 6
+export const SHEET_SIZE = SHEET_COLS * SHEET_ROWS
+
+export type PosterRef = { sheet: number; col: number; row: number }
+
+export const posterRef = (position: number): PosterRef => ({
+  sheet: Math.floor(position / SHEET_SIZE),
+  col: (position % SHEET_SIZE) % SHEET_COLS,
+  row: Math.floor((position % SHEET_SIZE) / SHEET_COLS),
+})
+
+/** Crops one poster out of its sheet. */
+export const posterStyle = (ref?: PosterRef): CSSProperties =>
+  ref
+    ? {
+        backgroundImage: `url(${config.posterBaseUrl}${ref.sheet}.jpg)`,
+        backgroundPosition: `${(ref.col / (SHEET_COLS - 1)) * 100}% ${(ref.row / (SHEET_ROWS - 1)) * 100}%`,
+        backgroundSize: `${SHEET_COLS * 100}% ${SHEET_ROWS * 100}%`,
+      }
+    : {}
 
 export type FilmData = Record<string, string | number | string[] | null>
 export type FilmBatch = FilmData[]
@@ -27,7 +54,7 @@ export class Film {
   synopsis?: string
   rating: number
   ageRating?: string
-  poster: string
+  posterRef: PosterRef
   cellId?: number
 
   constructor(data: FilmData, position: number) {
@@ -47,7 +74,7 @@ export class Film {
     this.synopsis = data.synopsis ? String(data.synopsis) : undefined
     this.rating = data.rating ? Number(data.rating) : 0
     this.ageRating = data.ageRating ? String(data.ageRating) : undefined
-    this.poster = `${position}.jpg`
+    this.posterRef = posterRef(position)
     this.cellId = position
   }
 }

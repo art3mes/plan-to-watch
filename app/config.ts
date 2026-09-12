@@ -7,7 +7,7 @@ const env = import.meta.env as unknown as {
 export default {
   // Posters are served from this site, by wall position. There is no separate
   // backdrop image: the detail panel blurs the poster instead.
-  posterBaseUrl: `${import.meta.env.VITE_TEXTURES_BASE_URL ?? '/media'}/single/`,
+  posterBaseUrl: `${import.meta.env.VITE_TEXTURES_BASE_URL ?? '/media'}/poster-sheets/`,
   sourceCodeUrl: 'https://github.com/art3mes/nothing-to-watch',
   malUrl: 'https://myanimelist.net',
   malAnimeBaseUrl: 'https://myanimelist.net/anime/',
