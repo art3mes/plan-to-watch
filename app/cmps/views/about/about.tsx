@@ -102,7 +102,7 @@ const items = [
         <br />
         <p>
           <small>
-            <i>*Not to be confused with the highest rated movies</i>
+            <i>*Not to be confused with the highest rated anime</i>
           </small>
         </p>
       </>

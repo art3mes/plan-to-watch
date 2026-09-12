@@ -6,16 +6,16 @@ import analyzer from 'vite-bundle-analyzer'
 import glsl from 'vite-plugin-glsl'
 // import viteBasicSslPlugin from "@vitejs/plugin-basic-ssl";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd())
   return {
     plugins: [
       react({}),
       tailwindcss(),
       glsl({
-        minify: Boolean(env.VITE_COMPRESS_GLSL),
+        minify: command === 'build' || Boolean(env.VITE_COMPRESS_GLSL),
       }),
-      ...(env.VITE_ANALYZE_BUNDLE ? [analyzer()] : []),
+      ...(mode === 'analyze' || env.VITE_ANALYZE_BUNDLE ? [analyzer()] : []),
       // viteBasicSslPlugin()
     ],
     build: {
@@ -40,7 +40,9 @@ export default defineConfig(({ mode }) => {
         ignored: ['**/data/**', '**/public/media/**', '**/public/json/**'],
       },
       headers: {
-        'Cross-Origin-Embedder-Policy': 'credentialless', // should be 'require-corp' but 'credentialless' allows for img hotlinking
+        // Every image is served from this site now, so the strict policy works
+        // everywhere - Safari does not support credentialless.
+        'Cross-Origin-Embedder-Policy': 'require-corp',
         'Cross-Origin-Opener-Policy': 'same-origin',
       },
     },

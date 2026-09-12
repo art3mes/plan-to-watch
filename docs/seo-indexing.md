@@ -7,8 +7,8 @@
 - **Static Assets** (favicon, manifest, etc.) - For proper application representation
 
 ### What Should NOT Be Indexed
-- **API Data** (`/json/`) - Raw film metadata not meant for direct access
-- **High-resolution Media** (`/media/high/`, `/media/mid/`, `/media/low/`) - Large assets for app performance
+- **API Data** (`/json/`) - Raw title metadata not meant for direct access
+- **High-resolution Media** (`/media/high/`, `/media/mid/`, `/media/low/`, `/media/poster-sheets/`) - Large assets for app performance
 - **Build Assets** (`/assets/`) - Compiled application resources
 
 ## Technical Implementation
@@ -21,29 +21,27 @@
 ### Scripts
 ```bash
 # Generate/update sitemap
-bun seo:sitemap
+pnpm seo:sitemap
 
 # Validate SEO setup
-bun seo:validate
+pnpm seo:validate
 ```
 
 ## SEO Considerations
 
 ### Single Page Application Challenges
-- **Dynamic Content**: Movies are loaded dynamically via WebGL visualization
-- **No Individual URLs**: Film discovery happens through interaction, not navigation
+- **Dynamic Content**: Titles are loaded dynamically via WebGL visualization
+- **No Individual URLs**: Discovery happens through interaction, not navigation
 - **JavaScript Required**: Full functionality requires JS execution
 
 ### Optimization Strategy
 1. **Meta Tags**: Proper title, description, and Open Graph tags in `index.html`
-2. **Structured Data**: Consider adding JSON-LD for movie/application schema
-3. **Social Sharing**: Individual film posters available at `/media/single/` for sharing
-4. **Performance**: Fast loading for better Core Web Vitals
+2. **Structured Data**: Consider adding JSON-LD for application schema
+3. **Performance**: Fast loading for better Core Web Vitals
 
 ### Search Engine Guidance
 - **Primary Focus**: Index the main application interface
-- **Content Discovery**: Users discover films through interactive exploration
-- **Social Sharing**: Individual films can be shared with poster images
+- **Content Discovery**: Users discover anime through interactive exploration
 
 ## Deployment Considerations
 
@@ -77,14 +75,14 @@ If using a CDN (Cloudflare, etc.), ensure:
 ## Future Enhancements
 
 ### Potential Improvements
-1. **Individual Film Pages**: Add URL routes for specific films
-2. **Dynamic Sitemap**: Generate sitemap from film database
-3. **Structured Data**: Add movie schema markup
-4. **Meta Tag Management**: Dynamic meta tags per film view
+1. **Individual Title Pages**: Add URL routes for specific titles
+2. **Dynamic Sitemap**: Generate sitemap from the title data
+3. **Structured Data**: Add schema markup per title
+4. **Meta Tag Management**: Dynamic meta tags per title view
 5. **Server-side Rendering**: Consider SSR for improved SEO
 
 ### Migration Considerations
-If adding individual film URLs, update:
-- Sitemap generation to include film pages
-- Robots.txt to allow film URL patterns
+If adding individual title URLs, update:
+- Sitemap generation to include title pages
+- Robots.txt to allow title URL patterns
 - Meta tag management for dynamic content

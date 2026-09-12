@@ -68,15 +68,26 @@ describe('ErrorBoundary', () => {
 
   it('should match snapshot for error state', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    // The details panel prints the stack trace and user agent, which carry
+    // machine-specific paths and versions - pin both so the snapshot is portable.
+    const userAgentSpy = vi
+      .spyOn(navigator, 'userAgent', 'get')
+      .mockReturnValue('Mozilla/5.0 (test) jsdom')
+    const ThrowStableError = () => {
+      const error = new Error('Test error message')
+      error.stack = 'Error: Test error message'
+      throw error
+    }
 
     const { container } = render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
+        <ThrowStableError />
       </ErrorBoundary>,
     )
 
     expect(container.firstChild).toMatchSnapshot()
 
+    userAgentSpy.mockRestore()
     consoleSpy.mockRestore()
   })
 

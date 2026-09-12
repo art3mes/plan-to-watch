@@ -30,12 +30,8 @@ Attribution-NonCommercial-ShareAlike 3.0 Unported License
 This exception applies to all shader code used for rendering and visual effects 
 within the Voroforce engine and related WebGL components.
 
-EXCEPTION FOR FILM DATA:
-All film data files (including but not limited to JSON files in public/json/ and
-image files in public/media/) are licensed under the Open Data Commons 
-Attribution License (ODC-By) v1.0 
-(https://opendatacommons.org/licenses/by/1-0/).
-
-This exception applies to all film data, metadata, and associated media assets.
-This licence covers the source code only. The WebGL fragment shaders, the
-anime data and the poster artwork carry their own terms - see NOTICE.md.
+EXCEPTION FOR ANIME DATA AND POSTER ARTWORK:
+The anime data (JSON files in public/json/) and the poster artwork (image files
+in public/media/) are not covered by this licence. The data is a derived
+database under the Open Database License (ODbL) v1.0; the artwork belongs to
+its respective rights holders. See NOTICE.md.

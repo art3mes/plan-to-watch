@@ -15,18 +15,22 @@ Guidance for Claude Code (claude.ai/code) working in this repository.
 
 ## Development commands
 
-Use **pnpm**, not bun (bun is not installed on this machine).
+Use **pnpm**. bun is not installed and the project no longer carries a `bun.lock`.
 
 - `pnpm dev` - dev server on port 3000
 - `pnpm build` - `tsc -b` then vite build
 - `pnpm check` - Biome lint and format
 - `pnpm run test` - unit tests (Vitest)
 - `pnpm test:e2e` - end-to-end tests (Playwright)
+- `pnpm run deploy` - build, check the file count, upload to Cloudflare Pages (`pnpm deploy` is pnpm's own workspace command, hence `run`)
 
-**Known noise, neither worth "fixing":**
+All settings live in one gitignored `.env.local` (template: `.env.local.example`), used by both `pnpm dev` and `pnpm build`. `MAL_CLIENT_ID` in it is read only by the data scripts; Vite never exposes non-`VITE_` variables to the site. Shaders are minified on every `vite build`, so there is no separate production env file.
+
+**Known noise, not worth "fixing":**
 
 - This checkout is CRLF (`core.autocrlf=true`) while Biome expects LF, so `pnpm check` reports format errors on files nobody touched. Do not mass-reformat the repo. `pnpm biome lint <files>` is the useful signal.
-- `app/cmps/common/error-boundary.test.tsx` fails its snapshot (1 of 58 tests). The committed snapshot captures a rendered React error stack, so it contains the original author's absolute paths (`/home/g/projects/private/...`), a Linux jsdom `userAgent` and react-dom line numbers from their install. It cannot pass anywhere but their machine. Running `vitest -u` would simply bake this machine's paths in instead - leave it alone.
+
+The error-boundary snapshot used to capture a real stack trace and jsdom user agent, so it only passed on upstream's machine. The test now pins both; all 58 tests should pass.
 
 ## Data pipeline (`scripts/anime/`)
 
@@ -53,6 +57,7 @@ Key invariants:
 - Detail-panel posters are packed 9x6 into sheets under `public/media/poster-sheets/`, not one file per title: 21,472 individual images exceed Cloudflare Pages' 20,000 file limit on their own. `posterStyle()` in `app/vf/utils/films.ts` crops one out with `background-position`; the geometry must match `SHEET` in step 7.
 - The focused cell's full-resolution layer (`VITE_EXPERIMENTAL_MEDIA_VERSION_3_ENABLED`) reads the same sheets. Upstream loaded one image per title and packed them into 9x6 virtual GPU layers; with `cols: 9, rows: 6` in its media config the engine's layer index becomes the sheet number, and `VirtualMediaGridArrayTexture` uploads a whole sheet when `sheets: true`. Turning this layer off makes the selected poster a stretched 110x165 DXT1 tile - visibly blocky, so keep it on.
 - `pnpm anime:atlases --sheets-only` rebuilds sheets without re-encoding the 105 atlas layers.
+- The repo commits a sample so a fresh clone runs: `public/json/0.json`, page `0` of each atlas level and poster sheets `0-3`, matched by the layer counts in `.env.local.example` (1/1/1/4). A data rebuild changes these files - commit them together or the sample drifts out of step.
 
 ### Texture encoding
 
@@ -70,7 +75,7 @@ The ETC selector bit mapping is `(msb,lsb)`: `(0,0)` = small positive, `(1,1)` =
 
 ### Film data shape
 
-`Film` carries `posterRef` (sheet index plus column/row), `malId`/`anilistId`/`kitsuId`, `title` (English where available, else romaji), `alt` (the other spellings), `synopsis`, `type`, `episodes`, `studios`, `genres`, `rating` (0-100, MAL first), `ageRating` and `poster`. There are **no backdrop images** - the detail panel blurs the poster instead. Favourites are keyed by `favoriteKey()` so rebuilt data does not orphan them.
+`Film` carries `posterRef` (sheet index plus column/row), `malId`/`anilistId`/`kitsuId`, `title` (English where available, else romaji), `alt` (the other spellings), `synopsis`, `type`, `episodes`, `studios`, `genres`, `rating` (0-100, MAL first) and `ageRating`. There are **no backdrop images** - the detail panel blurs the poster instead. Favourites are keyed by `favoriteKey()` so rebuilt data does not orphan them.
 
 ## Code style
 

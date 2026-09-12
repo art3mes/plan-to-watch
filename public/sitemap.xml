@@ -4,16 +4,16 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   
-  <!-- Main application - Interactive movie discovery visualization -->
+  <!-- Main application - interactive anime poster wall -->
   <url>
     <loc>https://plan-to-watch.pages.dev/</loc>
-    <lastmod>2026-09-11</lastmod>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <!-- Note: This is a SPA (Single Page Application) with dynamic content.
-       Individual films are discovered through the interactive visualization
+       Individual titles are discovered through the interactive visualization
        rather than traditional URL routes. Search engines will primarily
        index the main application interface. -->
   

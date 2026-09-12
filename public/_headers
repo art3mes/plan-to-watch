@@ -5,14 +5,18 @@
 # `arrayBuffer()` silently falls back to a plain ArrayBuffer, the workers
 # mutate copies, and the wall renders but never moves.
 #
-# `credentialless` lets the page load cross-origin images (the R2 bucket)
-# without those objects carrying CORP. Safari does not support it, which is
-# why functions/_middleware.js upgrades iOS to `require-corp` - for that path
-# the R2 objects must be uploaded with
-# `Cross-Origin-Resource-Policy: cross-origin` (see docs/deploy.md).
+# `require-corp` works in every browser, Safari included. It only allows
+# cross-origin files that opt in, which is fine here: every image and data file
+# is served from this site, and the two outside requests (Google Fonts and the
+# detect-gpu benchmark on unpkg) both send
+# `Cross-Origin-Resource-Policy: cross-origin`. Upstream needed
+# `credentialless` plus an iOS middleware only because it hotlinked TMDB images.
+#
+# No Pages Function is involved, so requests do not count against the Workers
+# free-plan daily limit.
 /*
   Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Embedder-Policy: credentialless
+  Cross-Origin-Embedder-Policy: require-corp
 
 # Hashed asset filenames change whenever content changes, so they can be
 # cached indefinitely.

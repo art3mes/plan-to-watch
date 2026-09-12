@@ -43,6 +43,11 @@ public/tmp.webm
 /playwright/.cache/
 
 # Generated poster sheets (~390 MB) - built by scripts/anime, shipped at deploy time, never committed
-/public/media/poster-sheets/
+# Sheets 0-3 cover the committed sample (json 0, one atlas page per level)
+/public/media/poster-sheets/*
+!/public/media/poster-sheets/[0-3].jpg
 /public/media/manifest.json
 /public/json/manifest.json
+
+# Local build and deploy leftovers
+.wrangler/

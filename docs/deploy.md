@@ -1,6 +1,6 @@
 # Deploying Plan to Watch
 
-Everything ships with the site - app, atlases, poster sheets and film data.
+Everything ships with the site - app, atlases, poster sheets and title data.
 No object storage, CDN account or payment method is involved.
 
 ## Why sheets exist
@@ -20,16 +20,19 @@ file per poster.
 ## Deploying
 
 ```bash
-cp .env.production.example .env.production   # first time only
 pnpm anime:check                             # chunks and atlases must agree
-pnpm run deploy                                  # build, check file count, upload
+pnpm run deploy                               # build, check file count, upload
 ```
 
 `pnpm run deploy` refuses to upload if `dist/` is over the file limit, so the
 failure is a message rather than a rejected deploy.
 
-The first run prompts to create the Pages project, and `pnpm wrangler login`
-if this machine has not authenticated yet.
+Live at <https://plan-to-watch.pages.dev>. Log in once with `pnpm wrangler login`
+(browser sign-in, nothing to paste). The first deploy prompts to create the
+Pages project; later deploys upload only files that changed, so a code-only
+change takes a minute or two.
+
+Wrangler is pinned to 4.45.0 because newer releases need Node 22.
 
 ### Deploy from this machine, not from GitHub
 
@@ -41,7 +44,9 @@ and no titles.
 
 1. `crossOriginIsolated` is `true` in the console. If it is false the workers
    run on copied buffers and the wall renders but never moves. The headers come
-   from `public/_headers`, plus `functions/_middleware.js` for iOS Safari.
+   from `public/_headers` alone - `require-corp`, which Safari supports too.
+   There is deliberately no Pages Function: one would run on every media
+   request and count against the Workers free plan's 100,000 requests a day.
 2. A poster sheet loads (`/media/poster-sheets/0.jpg`) and the detail panel
    shows the right poster for the right title.
 3. The wall itself draws - that is `/media/{low,mid,high}/dds/*.dds`.
@@ -61,11 +66,11 @@ pnpm run deploy
 compressed atlases alone - useful when only the sheet layout changed.
 
 If `anime:atlases` reports different layer counts, update
-`VITE_MEDIA_VERSION_*_LAYERS` in `.env.production` before deploying.
+`VITE_MEDIA_VERSION_*_LAYERS` in `.env.local` before deploying.
 
 ## If you outgrow the free plan
 
-The deployment is ~600 MB and Cloudflare does not meter Pages bandwidth, so
+The deployment is ~790 MB and Cloudflare does not meter Pages bandwidth, so
 this should hold for a personal site. If it ever needs to scale:
 
 - **Workers Paid ($5/mo)** raises the Pages file limit to 100,000, which would

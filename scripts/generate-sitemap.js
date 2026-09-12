@@ -25,13 +25,9 @@ const urls = [
     lastmod: config.lastModified,
     changefreq: 'weekly',
     priority: '1.0',
-    description: 'Main application - Interactive movie discovery visualization',
+    description: 'Main application - interactive anime poster wall',
   },
 ]
-
-// Optional: Add film URLs if the app grows to have individual film pages
-// This would require reading film data and generating URLs dynamically
-// const filmUrls = await generateFilmUrls() // Future enhancement
 
 function generateSitemap(baseUrl, urls) {
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -53,7 +49,7 @@ ${urls
   .join('\n\n')}
   
   <!-- Note: This is a SPA (Single Page Application) with dynamic content.
-       Individual films are discovered through the interactive visualization
+       Individual titles are discovered through the interactive visualization
        rather than traditional URL routes. Search engines will primarily
        index the main application interface. -->
   
