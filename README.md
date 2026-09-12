@@ -4,7 +4,7 @@ Your plan-to-watch list was never going to get shorter. Here is all of it at onc
 
 An interactive WebGL wall of **21,474 anime series and films**, rendered as a force-directed voronoi diagram of poster art.
 
-Repo: [art3mes/nothing-to-watch](https://github.com/art3mes/nothing-to-watch). A fork of [gnovotny/nothing-to-watch](https://github.com/gnovotny/nothing-to-watch), which does the same thing for films. The engine is theirs; the data pipeline, the texture encoders and the anime-specific app changes are what this fork adds.
+Repo: [art3mes/plan-to-watch](https://github.com/art3mes/plan-to-watch). A fork of [gnovotny/nothing-to-watch](https://github.com/gnovotny/nothing-to-watch), which does the same thing for films. The engine is theirs; the data pipeline, the texture encoders and the anime-specific app changes are what this fork adds.
 
 ## What is in the wall
 

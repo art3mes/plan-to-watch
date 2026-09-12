@@ -37,4 +37,4 @@ Poster images are the property of their respective studios, publishers and
 licensors. They are displayed at reduced size for identification and are not
 claimed by this project.
 
-To request removal of any material, [open an issue](https://github.com/art3mes/nothing-to-watch/issues).
+To request removal of any material, [open an issue](https://github.com/art3mes/plan-to-watch/issues).
