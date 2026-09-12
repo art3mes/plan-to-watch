@@ -88,12 +88,13 @@ export function CoreSettingsWidget({
           ? CELL_LIMIT.xxs
           : CELL_LIMIT.xs
         : isDefined(deviceClass)
-          ? CELL_LIMIT_ITEMS.findLast(
-              (p) =>
-                !p.doNotRecommend &&
-                (isDefined(p.recommendedDeviceClass)
-                  ? p.recommendedDeviceClass <= deviceClass
-                  : true),
+          ? // pick the largest count this device is rated for; the old
+            // "doNotRecommend" opt-out only existed for the 100,000 option,
+            // which the anime catalog cannot fill
+            CELL_LIMIT_ITEMS.findLast((p) =>
+              isDefined(p.recommendedDeviceClass)
+                ? p.recommendedDeviceClass <= deviceClass
+                : true,
             )?.value
           : undefined),
   )

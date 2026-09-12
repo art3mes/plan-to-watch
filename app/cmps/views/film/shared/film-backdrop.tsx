@@ -1,9 +1,11 @@
+import config from '@/config'
 import type { Film } from '@/vf/utils'
 
+// There are no separate backdrop images for anime, so the poster stands in.
 export const FilmBackdrop = ({ film }: { film: Film }) => {
   return (
     <img
-      src={`https://media.themoviedb.org/t/p/w300_and_h450_bestv2${film.backdrop}`}
+      src={`${config.posterBaseUrl}${film.poster}`}
       alt=''
       className='h-auto w-full'
     />

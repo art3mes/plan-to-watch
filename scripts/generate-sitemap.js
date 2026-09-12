@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Sitemap Generator for "There's nothing to watch"
+ * Sitemap Generator for "Plan to Watch"
  *
- * This script generates a sitemap.xml for the movie discovery application.
+ * This script generates a sitemap.xml for the anime discovery application.
  * Since this is primarily a SPA with dynamic content, the sitemap focuses
- * on the main application interface rather than individual film pages.
+ * on the main application interface rather than individual title pages.
  */
 
 import { writeFileSync } from 'fs'
@@ -13,7 +13,7 @@ import { resolve } from 'path'
 
 // Configuration
 const config = {
-  baseUrl: process.env.SITE_URL || 'https://nothing-to-watch.port80.ch',
+  baseUrl: process.env.SITE_URL || 'https://plan-to-watch.pages.dev',
   outputPath: resolve('public/sitemap.xml'),
   lastModified: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
 }

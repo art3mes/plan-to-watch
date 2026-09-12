@@ -24,7 +24,7 @@ export const FilmView = ({
   const [backdropErrored, setBackdropErrored] = useState(true)
 
   useEffect(() => {
-    if (filmRef.current?.tmdbId !== film?.tmdbId) {
+    if (filmRef.current?.cellId !== film?.cellId) {
       setBackdropHidden(true)
     }
     filmRef.current = film
@@ -67,7 +67,10 @@ export const FilmView = ({
                 },
               )}
               alt=''
-              src={`${config.backdropBaseUrl}${film.backdrop}`}
+              // no anime backdrops exist, so the poster is blurred and
+              // over-scaled to fill the panel behind the text
+              style={{ filter: 'blur(24px)', transform: 'scale(1.2)' }}
+              src={`${config.posterBaseUrl}${film.poster}`}
               onLoad={() => {
                 setBackdropHidden(false)
                 setBackdropErrored(false)
@@ -92,7 +95,7 @@ export const FilmView = ({
                   <div className='relative flex w-full flex-row items-start justify-between gap-3 pr-16 md:pr-28'>
                     <h3 className='font-black text-2xl leading-none md:text-3xl lg:text-4xl xl:text-5xl'>
                       {film.title}
-                      {film.year && (
+                      {film.showYear && (
                         <span className='font-medium text-foreground/50'>
                           &nbsp;({film.year})
                         </span>
@@ -101,14 +104,14 @@ export const FilmView = ({
                     <div className='absolute top-0 right-0 flex flex-row-reverse items-center gap-3'>
                       <FilmRatingGauge value={film.rating} />
                       <div className='hidden text-xxs leading-none md:not-landscape:block lg:hidden xl:block'>
-                        TMDB <br />
+                        MAL <br />
                         Score
                       </div>
                     </div>
                   </div>
                   <div className='flex flex-col gap-3'>
                     <p className='line-clamp-2 text-base text-foreground/80 italic leading-none md:line-clamp-1 lg:text-xl'>
-                      {film.tagline}
+                      {film.alt}
                     </p>
                     <div className='flex flex-row gap-3 pt-2'>
                       {film.genres?.map((genre) => (
@@ -128,7 +131,7 @@ export const FilmView = ({
           <div className='full mb-15 px-4 pb-6 md:px-6 lg:px-6 lg:pb-6 xl:px-9 xl:pb-9'>
             <div className='flex flex-col justify-end text-base leading-tight max-md:text-sm max-lg:h-[calc(4em*1.25)] group-hover:md:h-auto group-hover:md:min-h-[calc(4em*1.25)] lg:h-[calc(4em*1.25)] lg:text-xl group-hover:lg:h-auto'>
               <p className='max-lg:line-clamp-4 group-hover:max-lg:line-clamp-none group-hover:md:max-lg:line-clamp-4 lg:line-clamp-4 group-hover:lg:line-clamp-none'>
-                {film.overview}
+                {film.synopsis}
               </p>
             </div>
           </div>

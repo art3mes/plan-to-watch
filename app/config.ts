@@ -5,13 +5,17 @@ const env = import.meta.env as unknown as {
 }
 
 export default {
-  backdropBaseUrl: 'https://image.tmdb.org/t/p/w1280',
-  posterBaseUrl: 'https://image.tmdb.org/t/p/w300_and_h450_bestv2',
+  // Posters are served from this site, by wall position. There is no separate
+  // backdrop image: the detail panel blurs the poster instead.
+  posterBaseUrl: `${import.meta.env.VITE_TEXTURES_BASE_URL ?? '/media'}/single/`,
   sourceCodeUrl: 'https://github.com/gnovotny/nothing-to-watch',
-  tmdbUrl: 'https://themoviedb.org',
-  tmdbFilmBaseUrl: 'https://www.themoviedb.org/movie/',
-  imdbFilmBaseUrl: 'https://imdb.com/title/',
-  contactEmail: '96j0o1ivb@mozmail.com',
+  malUrl: 'https://myanimelist.net',
+  malAnimeBaseUrl: 'https://myanimelist.net/anime/',
+  aniListUrl: 'https://anilist.co',
+  aniListAnimeBaseUrl: 'https://anilist.co/anime/',
+  kitsuUrl: 'https://kitsu.app',
+  kitsuAnimeBaseUrl: 'https://kitsu.app/anime/',
+  contactEmail: undefined as string | undefined,
   disableUI: false,
   telemetry: {
     enabled:

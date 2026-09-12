@@ -49,7 +49,7 @@ export const Intro = () => {
           <h1 className='font-black text-4xl leading-none md:text-5xl md:leading-none'>
             <span className='inline-flex'>
               <span className='max-md:hidden'>"</span>
-              <i>There's nothing</i>
+              <i>Plan</i>
             </span>{' '}
             <span className='relative inline-flex'>
               <i>to watch</i>
@@ -99,8 +99,8 @@ export const Intro = () => {
 
 const MoviesDatasetLicenseInfo = () => (
   <span className='inline-flex text-xxs text-zinc-600 leading-none dark:text-zinc-300'>
-    Contains information from Kaggle's "Full TMDB Movies Dataset" which is made
-    available under the ODC Attribution License.
+    Contains information from Kitsu, MyAnimeList and the manami-project
+    anime-offline-database. Poster art belongs to its respective licensors.
   </span>
 )
 

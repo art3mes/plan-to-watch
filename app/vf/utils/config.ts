@@ -17,7 +17,7 @@ export type CustomLink = {
   name: string
   baseUrl: string
   slug: boolean
-  property: 'title' | 'tmdbId' | 'imdbId'
+  property: 'title' | 'malId' | 'anilistId' | 'kitsuId'
 }
 
 export type UserConfig = {
@@ -25,13 +25,16 @@ export type UserConfig = {
   devTools?: boolean
   customLinks?: CustomLink[]
   favorites?: {
-    [key: Film['tmdbId']]: {
+    // Keyed by provider id (see favoriteKey), not by wall position: rebuilding
+    // the data reshuffles positions and would otherwise orphan every favourite.
+    [key: string]: {
       cellId: VoroforceCell['id']
       title: Film['title']
       year: Film['year']
-      tagline: Film['tagline']
-      tmdbId: Film['tmdbId']
-      imdbId?: Film['imdbId']
+      alt: Film['alt']
+      malId?: Film['malId']
+      anilistId?: Film['anilistId']
+      kitsuId?: Film['kitsuId']
       poster?: Film['poster']
     }
   }

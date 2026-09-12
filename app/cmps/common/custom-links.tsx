@@ -18,8 +18,9 @@ export const CustomLinks = ({
 }: {
   film: {
     title: Film['title']
-    tmdbId: Film['tmdbId']
-    imdbId?: Film['imdbId']
+    malId?: Film['malId']
+    anilistId?: Film['anilistId']
+    kitsuId?: Film['kitsuId']
   }
   className?: string
   buttonClassName?: string

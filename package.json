@@ -1,5 +1,5 @@
 {
-	"name": "nothing-to-watch",
+	"name": "plan-to-watch",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
@@ -21,8 +21,16 @@
 		"test:e2e:headed": "bunx playwright test --headed",
 		"test:e2e:ui": "bunx playwright test --ui",
 		"test:e2e:debug": "bunx playwright test --debug",
+		"anime:catalog": "node scripts/anime/01-build-catalog.mjs",
+		"anime:kitsu": "node scripts/anime/02-fetch-kitsu.mjs",
+		"anime:mal": "node scripts/anime/03-fetch-mal.mjs",
+		"anime:popularity": "node scripts/anime/04-fetch-mal-popularity.mjs",
+		"anime:order": "node scripts/anime/05-order-and-chunk.mjs",
+		"anime:posters": "node scripts/anime/06-download-posters.mjs",
+		"anime:atlases": "node scripts/anime/07-build-atlases.mjs",
 		"seo:sitemap": "bun scripts/generate-sitemap.js",
-		"seo:validate": "echo '🔍 SEO Validation:' && echo '📄 robots.txt:' && cat public/robots.txt && echo '\\n🗺️  sitemap.xml exists:' && ls -la public/sitemap.xml"
+		"seo:validate": "echo '🔍 SEO Validation:' && echo '📄 robots.txt:' && cat public/robots.txt && echo '\\n🗺️  sitemap.xml exists:' && ls -la public/sitemap.xml",
+		"anime:check": "node scripts/anime/check-alignment.mjs"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.2.0",
@@ -70,6 +78,7 @@
 		"@vitejs/plugin-react-swc": "^3.11.0",
 		"@vitest/coverage-v8": "^3.2.4",
 		"jsdom": "^26.1.0",
+		"sharp": "^0.35.4",
 		"texture-compressor": "^1.0.2",
 		"typescript": "~5.8.3",
 		"vite": "^7.0.6",

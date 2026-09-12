@@ -2,7 +2,7 @@ import { HeartOff, HeartPlus, Plus } from 'lucide-react'
 import type { DialogProps } from 'vaul'
 import { useShallowState } from '../../../../../store'
 import { cn } from '../../../../../utils/tw'
-import type { Film, VoroforceCell } from '../../../../../vf'
+import { type Film, type VoroforceCell, favoriteKey } from '../../../../../vf'
 import { CustomLinks } from '../../../../common/custom-links'
 import { StdLinks } from '../../../../common/standard-links'
 import { Button } from '../../../../ui/button'
@@ -30,7 +30,7 @@ export const FilmViewFooter = ({
     useShallowState((state) => ({
       userConfig: state.userConfig,
       setUserConfig: state.setUserConfig,
-      isFavorite: film && state.userConfig?.favorites?.[film.tmdbId],
+      isFavorite: film && state.userConfig?.favorites?.[favoriteKey(film)],
       setAddCustomLinkTypeOpen: state.setAddCustomLinkTypeOpen,
     }))
 
@@ -76,15 +76,16 @@ export const FilmViewFooter = ({
                 variant={isFavorite ? 'default' : 'outline'}
                 onClick={() => {
                   if (isFavorite) {
-                    delete userConfig.favorites?.[film.tmdbId]
+                    delete userConfig.favorites?.[favoriteKey(film)]
                   } else {
                     if (!userConfig.favorites) userConfig.favorites = {}
-                    userConfig.favorites[film.tmdbId] = {
+                    userConfig.favorites[favoriteKey(film)] = {
                       cellId: voroforceCell?.id,
-                      imdbId: film.imdbId,
-                      tmdbId: film.tmdbId,
+                      malId: film.malId,
+                      anilistId: film.anilistId,
+                      kitsuId: film.kitsuId,
                       title: film.title,
-                      tagline: film.tagline,
+                      alt: film.alt,
                       year: film.year,
                       poster: film.poster,
                     }

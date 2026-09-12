@@ -50,20 +50,20 @@ const items = [
           solely for educational and informational purposes. All rights to the
           materials used remain with their respective owners. I do not claim
           ownership of any third-party content. If you are the rightful owner of
-          any material featured here and have concerns about its use, please{' '}
-          <Link href={`mailto:${config.contactEmail}`}>contact</Link> me - I
-          will address the issue promptly.
+          any material featured here and have concerns about its use, please
+          open an issue on the source repository - I will address it promptly.
         </p>
         <br />
         <p>
-          The dataset is made available under the{' '}
-          <Link href='http://opendatacommons.org/licenses/by/1.0/'>
-            Open Data Commons Attribution License
-          </Link>{' '}
-          and is sourced from{' '}
-          <Link href='https://www.kaggle.com/datasets/asaniczka/tmdb-movies-dataset-2023-930k-movies/data'>
-            Kaggle's TMDB Movies Dataset
+          Titles, artwork and synopses come from{' '}
+          <Link href='https://kitsu.app'>Kitsu</Link> and{' '}
+          <Link href='https://myanimelist.net'>MyAnimeList</Link>, cross
+          referenced through the{' '}
+          <Link href='https://github.com/manami-project/anime-offline-database'>
+            anime-offline-database
           </Link>
+          . Posters remain the property of their respective studios and
+          licensors.
         </p>
         <br />
         <p>
@@ -81,16 +81,16 @@ const items = [
     content: (
       <>
         <p>
-          The silver screen's heyday is arguably behind us. Luckily, we have
-          over a hundred years of cinema to fall back on.
+          Your plan-to-watch list was never going to get shorter. Here is all of
+          it at once.
         </p>
         <br />
         <p>
-          This gallery features a collection of the 50,000 most <i>popular*</i>{' '}
-          movies according to <Link href={config.tmdbUrl}>TMDB</Link>, with data
-          current as of early 2025. The movies are sorted by popularity in
-          descending order, starting from the center of the grid and moving
-          outward.
+          This gallery features 21,474 anime series and films - every entry
+          Kitsu and <Link href={config.malUrl}>MyAnimeList</Link> list, minus
+          hentai. Each show's most <i>popular*</i> entry comes first, starting
+          from the center of the grid and moving outward, with sequels, films
+          and OVAs filling the ring beyond them.
         </p>
         <br />
         <p>

@@ -70,12 +70,12 @@ export const PRESET_ITEMS: PresetItems = [
   ],
 ]
 
+// The whole catalog is 21,474 titles, so the upper options from the film
+// version (25k-100k) have nothing left to show and are gone.
 export enum CELL_LIMIT {
   xxs = 5000,
   xs = 10000,
-  sm = 25000,
-  md = 50000,
-  lg = 100000,
+  sm = 21474,
 }
 
 export const CELL_LIMIT_ITEMS = [
@@ -90,19 +90,8 @@ export const CELL_LIMIT_ITEMS = [
   },
   {
     value: CELL_LIMIT.sm,
-    label: '25,000',
-    recommendedDeviceClass: DEVICE_CLASS.low,
-  },
-  {
-    value: CELL_LIMIT.md,
-    label: '50,000',
+    label: 'All 21,474',
     recommendedDeviceClass: DEVICE_CLASS.mid,
-  },
-  {
-    value: CELL_LIMIT.lg,
-    label: '100,000',
-    recommendedDeviceClass: DEVICE_CLASS.high,
-    doNotRecommend: true,
   },
 ]
 

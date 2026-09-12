@@ -83,7 +83,7 @@ export const Favorites = () => {
                       </span>
                     </h6>
                     <p className='line-clamp-1 hidden font-medium text-base text-foreground/90 leading-none md:inline-block'>
-                      {film.tagline}
+                      {film.alt}
                     </p>
                     <div
                       className={cn(
@@ -119,7 +119,7 @@ export const Favorites = () => {
                       size='icon'
                       className='!size-6 [&_svg]:!size-4 cursor-pointer rounded-full'
                       onClick={() => {
-                        delete favorites?.[Number.parseInt(key)]
+                        delete favorites?.[key]
                         userConfig.favorites = { ...favorites }
                         setUserConfig(userConfig)
                       }}

@@ -27,6 +27,12 @@ _ref
 _ref/*
 public/tmp.webm
 
+# Anime pipeline: raw downloads and crawl output (regenerable, ~700MB)
+/data/
+
+# Claude Code local tooling
+.claude/
+
 # Test Coverage
 /coverage/
 

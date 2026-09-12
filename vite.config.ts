@@ -34,6 +34,11 @@ export default defineConfig(({ mode }) => {
     server: {
       host: '0.0.0.0',
       port: 3000,
+      // The anime pipeline writes into data/ and public/media|json while the
+      // dev server runs; without this each write triggers a full page reload.
+      watch: {
+        ignored: ['**/data/**', '**/public/media/**', '**/public/json/**'],
+      },
       headers: {
         'Cross-Origin-Embedder-Policy': 'credentialless', // should be 'require-corp' but 'credentialless' allows for img hotlinking
         'Cross-Origin-Opener-Policy': 'same-origin',

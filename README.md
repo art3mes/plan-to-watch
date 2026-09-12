@@ -1,290 +1,80 @@
-# There's nothing to watch...
+# Plan to Watch
 
-The silver screen's heyday is arguably behind us. Luckily, we have
-over a hundred years of cinema to fall back on.
+Your plan-to-watch list was never going to get shorter. Here is all of it at once.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Creative Commons License](https://img.shields.io/badge/License-CC%20BY--NC--SA%203.0-lightgrey.svg)
-![ODC Attribution License](https://img.shields.io/badge/License-ODC%20By-brightgreen.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)
-![React](https://img.shields.io/badge/React-19.1-blue.svg)
-![WebGL](https://img.shields.io/badge/WebGL-enabled-green.svg)
+An interactive WebGL wall of **21,474 anime series and films**, rendered as a force-directed voronoi diagram of poster art.
 
-## 🎬 Overview
-An experimental WebGL gallery that visualizes tens of thousands of film posters in an interactive force-directed voronoi diagram.
+A fork of [gnovotny/nothing-to-watch](https://github.com/gnovotny/nothing-to-watch), which does the same thing for films. The engine is theirs; the data pipeline, the texture encoders and the anime-specific app changes are what this fork adds.
 
-### Key Features
+## What is in the wall
 
-- **Interactive WebGL Visualization**: Real-time rendering of tens of thousands of film posters
-- **Custom Voroforce Engine**: Purpose-built force simulation and rendering system with multi-threading support
-- **Responsive Design**: Adapts to desktop, tablet, and mobile devices
-- **Performance Optimized**: GPU-accelerated rendering with efficient memory management
-- **Film Discovery**: Explore movies through visual relationships and clustering
-- **Multiple View Modes**: Intro, selection, and preview modes for different user experiences
+| Rule | Detail |
+|---|---|
+| Types | TV, movies, OVA, ONA, plus specials that stand on their own |
+| Excluded | Hentai only |
+| Included on purpose | Ecchi, Chinese and Korean animation, and every sequel as its own entry |
+| Order | Each franchise's most popular entry first, by MyAnimeList member count, spiralling out from the centre; sequels, films and OVAs fill the outer rings |
+| Titles | English where one exists, romaji otherwise, with the other spellings underneath |
 
-## 🚀 Quick Start
+## Data sources
 
-### Prerequisites
+- **[Kitsu](https://kitsu.app)** - titles, synopses, posters, ratings, popularity, franchise links. No API key needed.
+- **[MyAnimeList](https://myanimelist.net)** - member counts for ordering, plus synopses and English titles for the ~4.3k titles Kitsu has not mapped. Needs a free client ID (see below).
+- **[manami-project/anime-offline-database](https://github.com/manami-project/anime-offline-database)** - the catalogue backbone and cross-provider ID mapping.
 
-- **Bun** (recommended) or Node.js 18+ with a package manager of your choice (npm, yarn, pnpm, etc.)
-- Modern browser with WebGL 2.0 support
+AniList is deliberately **not** used: its terms forbid mass collection of media data, which is exactly what building a static dataset is.
 
-### Installation
+## Rebuilding the data
 
-1. **Clone the repository**
-   ```bash
-   git clone git@github.com:gnovotny/nothing-to-watch.git
-   cd nothing-to-watch
-   ```
+Requires `MAL_CLIENT_ID` in `.env.local`, from [myanimelist.net/apiconfig](https://myanimelist.net/apiconfig) (register an app as `other` / non-commercial).
 
-2. **Set up environment variables**
-   ```bash
-   cp .env.local.example .env.local
-   ```
+```bash
+pnpm anime:catalog      # manami dump -> data/build/catalog.json     (instant)
+pnpm anime:kitsu        # Kitsu crawl, 20 titles per request         (~30 min)
+pnpm anime:popularity   # MAL popularity ranking, 500 per request    (~1 min)
+pnpm anime:mal          # MAL details for titles Kitsu lacks         (~1-2 h)
+pnpm anime:order        # merge, group franchises, order, cut chunks (instant)
+pnpm anime:posters      # download one poster per title              (~20 min, ~1 GB)
+pnpm anime:atlases      # pack and compress the texture atlases      (~5 min)
+```
 
-3. **Install dependencies**
-   ```bash
-   bun install
-   ```
+Every crawl is resumable - rerun after an interruption and it continues. Poster files are keyed by provider ID, not by wall position, so re-ordering the wall never re-downloads anything.
 
-4. **Start development server**
-   ```bash
-   bun dev
-   ```
+The first step needs `data/raw/anime-offline-database-minified.json` from the [dataset releases](https://github.com/manami-project/anime-offline-database/releases).
 
-5. **Open your browser**
-   Navigate to `http://localhost:3000`
+### Texture encoding
 
-## 🛠 Development
+The engine wants DXT1 inside DDS for desktop GPUs and ETC inside KTX for phones. `texture-compressor` only shells out to binaries that are not available here, so `scripts/anime/encode.mjs` implements both formats directly - about 400 lines, no native dependencies. The ETC selector bit order was recovered empirically by decoding upstream's own `low/ktx/0.ktx` against its `low/dds/0.dds` twin.
 
-### Available Scripts
+## Development
+
+```bash
+pnpm install
+cp .env.local.example .env.local
+pnpm dev                # http://localhost:3000
+```
+
+`bun` works too, but is not required; `pnpm` is what this fork is developed against.
 
 | Command | Description |
 |---------|-------------|
-| `bun dev` | Start development server on port 3000 |
-| `bun build` | Build for production with TypeScript compilation |
-| `bun preview` | Preview production build |
-| `bun lint` | Lint code with Biome |
-| `bun format` | Format code with Biome |
-| `bun check` | Run comprehensive Biome checks |
-| `bun check:write` | Auto-fix Biome issues |
-| `bun analyze` | Build with bundle analysis |
+| `pnpm dev` | Dev server on port 3000 |
+| `pnpm build` | Typecheck and production build |
+| `pnpm check` | Biome lint and format |
+| `pnpm run test` | Unit tests (Vitest) |
+| `pnpm test:e2e` | End-to-end tests (Playwright) |
 
-### Testing Commands
+Note that this checkout uses CRLF line endings on Windows while Biome expects LF, so `pnpm check` reports formatting differences on files nobody has touched.
 
-| Command | Description |
-|---------|-------------|
-| `bun run test` | Run unit tests with Vitest |
-| `bun test:unit:coverage` | Run unit tests with coverage |
-| `bun test:e2e` | Run end-to-end tests with Playwright |
-| `bun test:e2e:headed` | Run E2E tests in headed mode |
-| `bun test:e2e:ui` | Run E2E tests with Playwright UI |
+## Deployment
 
-## 🏗 Architecture
+Cloudflare Pages for the app, Cloudflare R2 for the media. The 21,474 single posters alone exceed the Pages per-site file limit, so `VITE_TEXTURES_BASE_URL` should point at R2 rather than shipping media with the site.
 
-### Stack
+Cross-origin isolation headers are required for the multi-threaded simulation (`functions/_middleware.js` handles this on Pages).
 
-- **React 19** with TypeScript and Vite
-- **Tailwind CSS** with Radix UI components (Shadcn)
-- **Zustand** for state management
+## Licence
 
-### Engine (Voroforce)
-
-- Custom vanilla JS force simulation and rendering engine
-- **OGL** - Lightweight WebGL library for 3D rendering
-- **GLSL shaders**
-- **Multi-threaded** simulation support
-
-### Project Structure
-
-```
-├── app/                    # React application
-│   ├── main.tsx           # Entry point
-│   ├── app.tsx            # Main App component
-│   ├── store/             # Zustand store and slices
-│   ├── cmps/              # React components
-│   │   ├── common/        # Shared components
-│   │   ├── ui/            # Radix UI components
-│   │   └── views/         # Main view components
-│   ├── vf/                # Voroforce integration layer
-│   └── utils/             # Utility functions
-├── voroforce/             # Standalone WebGL engine
-│   ├── simulation/        # Force simulation logic
-│   ├── display/           # Rendering system
-│   ├── controls/          # User interaction handling
-│   └── utils/             # Engine utilities
-└── public/                # Static assets
-    ├── json/              # Film data files
-    └── media/             # Film poster images
-```
-
-### Data Flow
-
-1. **Film Data Loading**: JSON files loaded from `public/json/`
-2. **Film Image Serving**: Multi-resolution variants from `public/media/`
-3. **Voroforce Processing**: Data processed into engine
-4. **React Integration**: Components interact through Zustand store
-5. **Mode Management**: User interactions trigger mode changes (intro/select/preview)
-
-## 🎯 Core Components
-
-### Voroforce Engine
-
-The heart of the application is the custom Voroforce engine:
-
-- **Simulation**: Force directed graph with multiple force types
-- **Rendering**: WebGL-based poster rendering with efficient batching
-- **Controls**: Mouse/touch/keyboard interaction with zoom, pan, and selection
-- **Performance**: Multi-threaded simulation with GPU optimization
-
-### State Management
-
-Zustand store organized into slices:
-
-- **UI Slice**: Interface state, modals, settings
-- **Voroforce Slice**: Engine integration and control
-- **Film Data Slice**: Film data management and loading
-
-### React Component Architecture
-
-- **Layout Components**: Navigation, modals, responsive containers
-- **UI Components**: Radix-based design system components
-- **View Components**: Main application views and screens
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create `.env.local` for local development:
-
-```bash
-VITE_TEXTURES_BASE_URL=/media
-VITE_FILM_INFO_BASE_URL=/json
-VITE_MEDIA_VERSION_0_LAYERS=1
-VITE_MEDIA_VERSION_1_LAYERS=1
-VITE_MEDIA_VERSION_2_LAYERS=1
-VITE_EXPERIMENTAL_MEDIA_VERSION_3_ENABLED=1
-```
-
-### Performance Tuning
-
-The application includes several performance optimization features:
-
-- **Device Detection**: Recommended presets and settings based on device capabilities
-- **Memory Management**: Efficient WebGL resource handling
-- **Batch Loading**: Chunked film data & media loading
-- **Image Variants**: Multiple resolution options for different scaling levels
-
-## 🧪 Testing
-
-### Unit Tests
-
-Uses **Vitest** with **@testing-library/react**:
-
-```bash
-bun test:unit          # Run unit tests
-bun test:unit:coverage # With coverage report
-```
-
-### End-to-End Tests
-
-Uses **Playwright** for E2E testing:
-
-```bash
-bun test:e2e           # Run E2E tests
-bun test:e2e:headed    # With visible browser
-bun test:e2e:ui        # With Playwright UI
-```
-
-### Code Quality
-
-- **Biome**: Linting and formatting
-- **TypeScript**: Static type checking
-- **Pre-commit hooks**: Automated code quality checks
-
-## 🎨 Styling
-
-### Design System
-
-- **Tailwind CSS** for utility-first styling
-- **Radix UI** for accessible component primitives
-- **Custom CSS variables** for theme management
-- **Responsive design** with mobile-first approach
-
-### Theme Support
-
-- Dark/light theme switching
-- CSS custom properties for consistent theming
-- Radix UI theme integration
-
-## 📱 Browser Support
-
-### Minimum Requirements
-
-- **WebGL 2.0** support
-- **ES2018** JavaScript features
-- **Modern browsers**: Chrome 70+, Firefox 78+, Safari 14+, Edge 79+
-
-### Performance Considerations
-
-- **GPU Requirements**: Dedicated graphics recommended for optimal performance
-- **Memory**: 2GB+ RAM recommended for large datasets
-- **Network**: Good connection for media loading
-
-## 🚀 Deployment
-
-### Production Build
-
-```bash
-bun build              # Create production build
-bun preview            # Preview production build
-```
-
-### Security Headers
-
-The application requires specific security headers:
-
-- **COEP**: `require-corp` for production
-- **CORS**: Proper media hosting configuration
-- **CSP**: Content Security Policy for WebGL applications
-
-## 🤝 Contributing
-
-### Development Setup
-
-1. Follow the [Quick Start](#-quick-start) guide
-2. Install development dependencies
-3. Run the development server
-4. Make your changes
-5. Run tests: `bun test:unit && bun test:e2e`
-6. Ensure code quality: `bun check`
-
-### Code Style
-
-- **Biome** for linting and formatting
-- **Single quotes** for JS/TS strings  
-- **2-space indentation**
-- **Semicolons** only when needed
-- **Tailwind class sorting** enabled
-
-### Commit Guidelines
-
-- Use descriptive commit messages
-- Reference issues when applicable
-- Include tests for new features
-- Ensure all checks pass
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-**Exceptions**: 
-- WebGL fragment shaders are licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
-- Film data is licensed under the Open Data Commons Attribution License (ODC-By) v1.0.
-
-## 🙋‍♂️ Support
-
-If you have any issues or questions:
-
-- **GitHub Issues**: Open an issue on this repository
-- **Email**: Contact at [96j0o1ivb@mozmail.com](mailto:96j0o1ivb@mozmail.com)
+- Code: MIT, as inherited from the upstream project - the original copyright notice stays.
+- WebGL fragment shaders: Creative Commons BY-NC-SA 3.0, so **non-commercial use only**.
+- Anime metadata: from Kitsu, MyAnimeList and anime-offline-database, each under its own terms. MyAnimeList's API licence also restricts this to non-commercial use.
+- Poster art: property of the respective studios and licensors, used here for identification only.
