@@ -41,3 +41,8 @@ public/tmp.webm
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Generated poster sheets (~390 MB) - built by scripts/anime, shipped at deploy time, never committed
+/public/media/poster-sheets/
+/public/media/manifest.json
+/public/json/manifest.json
