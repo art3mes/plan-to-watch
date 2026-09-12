@@ -71,9 +71,12 @@ rclone size r2:plan-to-watch-media
 ```bash
 cp .env.production.example .env.production   # first time only
 pnpm anime:check                             # chunks and atlases must agree
-pnpm build
-pnpm wrangler pages deploy dist --project-name=plan-to-watch
+pnpm deploy                                  # build, prune, upload
 ```
+
+`pnpm deploy` runs the build, strips `dist/media` and `dist/json` (they come from
+R2, and leaving them in would blow the 20,000 file limit), then uploads. It fails
+loudly if the pruned output is still over the limit.
 
 The first deploy asks to create the project. Wrangler will prompt for login
 (`pnpm wrangler login`) if this machine has not authenticated yet.
