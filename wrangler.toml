@@ -1,0 +1,12 @@
+name = "plan-to-watch"
+compatibility_date = "2026-09-12"
+pages_build_output_dir = "dist"
+
+# Posters and film data live in R2, not in the deployment. Two reasons:
+# Pages allows 20,000 files per deployment on the free plan and the media alone
+# is ~21,700, and serving ~30 MB per visitor from the site would be billed as
+# site bandwidth. The Function in functions/media/ streams the bucket from this
+# same origin, so no custom domain, CORS or CORP configuration is needed.
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "plan-to-watch-media"
