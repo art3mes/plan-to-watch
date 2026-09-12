@@ -10,9 +10,12 @@ poster image per title is 21,472 files on its own, which is over the limit
 before anything else is counted. Packing them 9x6 into 1980x1980 sheets turns
 that into ~400 files, and the whole deployment lands around 700 files.
 
-The detail panel crops a poster out of its sheet with `background-position`
-(`posterStyle()` in `app/vf/utils/films.ts`), so a visitor downloads one sheet
-instead of one file per poster they hover.
+The same sheets serve two consumers. The detail panel crops a poster out with
+`background-position` (`posterStyle()` in `app/vf/utils/films.ts`), and the wall's
+full-resolution layer for the focused cell uploads a whole sheet to the GPU at
+once - the engine already arranged single posters in exactly this 9x6 layout, so
+the shader is unchanged. Either way a visitor downloads one sheet rather than one
+file per poster.
 
 ## Deploying
 

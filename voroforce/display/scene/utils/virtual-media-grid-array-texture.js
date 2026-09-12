@@ -25,6 +25,9 @@ export class VirtualMediaGridArrayTexture extends Texture {
     this.tileWidth = tileWidth
     this.tileHeight = tileHeight
     this.length = length
+    // When the source images are pre-packed sheets (cols x rows tiles already
+    // laid out), each load is a whole layer rather than a single tile.
+    this.sheets = Boolean(args.mediaVersion.sheets)
 
     // const maxLayers = gl.getParameter(gl.MAX_ARRAY_TEXTURE_LAYERS)
     // this.length = Math.min(
@@ -142,6 +145,26 @@ export class VirtualMediaGridArrayTexture extends Texture {
     }
 
     this.pendingLayerUpdates.forEach(({ index, bytes }) => {
+      if (this.sheets) {
+        // index is the sheet number; its tiles are already where the per-tile
+        // path below would have written them, so one upload covers all of them
+        // and the shader's sampling is unchanged.
+        this.gl.texSubImage3D(
+          this.gl.TEXTURE_2D_ARRAY,
+          0,
+          0,
+          0,
+          index % this.length,
+          this.cols * this.tileWidth,
+          this.rows * this.tileHeight,
+          1,
+          this.format,
+          this.type,
+          bytes,
+        )
+        return
+      }
+
       const tileIndex = index % this.layerCapacity
       const tileRow = Math.floor(tileIndex / this.cols)
       const tileCol = tileIndex % this.cols

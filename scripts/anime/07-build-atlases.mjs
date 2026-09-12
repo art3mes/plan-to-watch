@@ -188,3 +188,4 @@ writeFileSync(
 console.log(`poster sheets: ${sheetCount} files of ${SHEET.cols}x${SHEET.rows}`)
 console.log('layer counts for .env.local:')
 VERSIONS.forEach((v, i) => console.log(`  VITE_MEDIA_VERSION_${i}_LAYERS=${v.layers}`))
+console.log(`  VITE_MEDIA_VERSION_3_LAYERS=${sheetCount}`)

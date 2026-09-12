@@ -51,7 +51,7 @@ Key invariants:
 - Order is each franchise's most popular entry first (MAL member count), then all remaining sequels and films.
 - After `anime:atlases`, update `VITE_MEDIA_VERSION_*_LAYERS` in `.env.local` with the layer counts it prints.
 - Detail-panel posters are packed 9x6 into sheets under `public/media/poster-sheets/`, not one file per title: 21,472 individual images exceed Cloudflare Pages' 20,000 file limit on their own. `posterStyle()` in `app/vf/utils/films.ts` crops one out with `background-position`; the geometry must match `SHEET` in step 7.
-- The experimental full-resolution texture layer (`VITE_EXPERIMENTAL_MEDIA_VERSION_3_ENABLED`) wants one image per title and is therefore off. The deepest zoom uses the high atlas instead.
+- The focused cell's full-resolution layer (`VITE_EXPERIMENTAL_MEDIA_VERSION_3_ENABLED`) reads the same sheets. Upstream loaded one image per title and packed them into 9x6 virtual GPU layers; with `cols: 9, rows: 6` in its media config the engine's layer index becomes the sheet number, and `VirtualMediaGridArrayTexture` uploads a whole sheet when `sheets: true`. Turning this layer off makes the selected poster a stretched 110x165 DXT1 tile - visibly blocky, so keep it on.
 - `pnpm anime:atlases --sheets-only` rebuilds sheets without re-encoding the 105 atlas layers.
 
 ### Texture encoding

@@ -39,8 +39,13 @@ const mediaConfig = {
 export default mediaConfig
 
 export const uncompressedSingleMediaVersionConfig = {
-  cols: 1,
-  rows: 1,
+  // The focused cell's full-resolution posters. Upstream loaded one 220x330
+  // image per title and packed them into 9x6 virtual layers on the GPU; here the
+  // same 9x6 layout arrives pre-packed as a sheet, so cols/rows of 9x6 make the
+  // engine's layer index the sheet number. 21,472 single files would exceed
+  // Cloudflare Pages' file limit; 398 sheets do not.
+  cols: 9,
+  rows: 6,
   virtualCols: 9,
   virtualRows: 6,
   tileWidth: 220,
@@ -48,11 +53,12 @@ export const uncompressedSingleMediaVersionConfig = {
   width: 1980,
   height: 1980,
 
-  layers: 50000, // real layer count for 50000/54: 925.9 = 926
+  layers: Number.parseInt(import.meta.env.VITE_MEDIA_VERSION_3_LAYERS) || 398,
   virtualLayers: 50,
   layerIndexStart: 0,
-  layerSrcFormat: '/single/{INDEX}.jpg',
+  layerSrcFormat: '/poster-sheets/{INDEX}.jpg',
   type: 'uncompressed-single',
+  sheets: true,
 }
 
 export const mediaConfigWithUncompressedSingleVersion = {
