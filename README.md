@@ -74,7 +74,10 @@ Cross-origin isolation headers are required for the multi-threaded simulation (`
 
 ## Licence
 
+Full third-party terms are in [NOTICE.md](NOTICE.md).
+
+
 - Code: MIT, as inherited from the upstream project - the original copyright notice stays.
 - WebGL fragment shaders: Creative Commons BY-NC-SA 3.0, so **non-commercial use only**.
-- Anime metadata: from Kitsu, MyAnimeList and anime-offline-database, each under its own terms. MyAnimeList's API licence also restricts this to non-commercial use.
+- Anime data: anime-offline-database under ODbL v1.0 (the served title data is a derived database, shared under the same terms); MyAnimeList under its API licence, non-commercial; Kitsu credited as a source.
 - Poster art: property of the respective studios and licensors, used here for identification only.

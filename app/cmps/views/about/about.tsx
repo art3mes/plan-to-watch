@@ -50,8 +50,9 @@ const items = [
           solely for educational and informational purposes. All rights to the
           materials used remain with their respective owners. I do not claim
           ownership of any third-party content. If you are the rightful owner of
-          any material featured here and have concerns about its use, please
-          open an issue on the source repository - I will address it promptly.
+          any material featured here and have concerns about its use, please{' '}
+          <Link href={`${config.sourceCodeUrl}/issues`}>open an issue</Link> and
+          it will be removed promptly.
         </p>
         <br />
         <p>
@@ -62,8 +63,14 @@ const items = [
           <Link href='https://github.com/manami-project/anime-offline-database'>
             anime-offline-database
           </Link>
-          . Posters remain the property of their respective studios and
-          licensors.
+          . Anime data from MyAnimeList is used as authorized by MyAnimeList under
+          its API licence. The anime-offline-database is available under the{' '}
+          <Link href='https://opendatacommons.org/licenses/odbl/1-0/'>
+            Open Database License
+          </Link>
+          , and the derived data this site serves is shared under the same terms.
+          Posters remain the property of their respective studios and licensors
+          and are shown for identification only.
         </p>
         <br />
         <p>

@@ -1,6 +1,7 @@
 MIT License
 
 Copyright (c) 2025 There's nothing to watch
+Copyright (c) 2026 art3mes (Plan to Watch modifications)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,3 +37,5 @@ Attribution License (ODC-By) v1.0
 (https://opendatacommons.org/licenses/by/1-0/).
 
 This exception applies to all film data, metadata, and associated media assets.
+This licence covers the source code only. The WebGL fragment shaders, the
+anime data and the poster artwork carry their own terms - see NOTICE.md.
