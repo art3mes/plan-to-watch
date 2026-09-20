@@ -33,6 +33,14 @@ export default defineConfig(({ command, mode }) => {
     },
     server: {
       host: '0.0.0.0',
+      // The MAL relay is a Cloudflare Function, so it does not exist under
+      // Vite. Run it locally with `pnpm dev:api` and this forwards to it.
+      proxy: {
+        '/api': {
+          target: 'http://127.0.0.1:8788',
+          changeOrigin: false,
+        },
+      },
       port: 3000,
       // The anime pipeline writes into data/ and public/media|json while the
       // dev server runs; without this each write triggers a full page reload.

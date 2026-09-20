@@ -66,6 +66,16 @@ const createMockState = (overrides: Partial<StoreState> = {}): StoreState => ({
   filmBatches: new Map(),
 
   // Apply overrides
+  // List Slice defaults
+  listOpen: false,
+  setListOpen: () => {},
+  toggleListOpen: () => {},
+  listState: "idle",
+  listDimOthers: false,
+  setListDimOthers: () => {},
+  loadList: async () => {},
+  clearList: () => {},
+
   ...overrides,
 })
 

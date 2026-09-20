@@ -19,6 +19,20 @@ An anime fork of [gnovotny/nothing-to-watch](https://github.com/gnovotny/nothing
 | Titles | English where one exists, romaji otherwise, with the other spellings underneath |
 | Details | Year, genres, score, synopsis, and links to MyAnimeList, AniList and Kitsu |
 
+## Marking your own list
+
+Enter a public MyAnimeList username (the checklist icon, top right) and every
+title on that profile is marked on the wall: a lit rim around the cell, gold for
+completed, blue for watching, yellow for on hold, red for dropped, violet for
+plan to watch. A switch fades everything else so only your list stays lit.
+
+The username lives in your browser only. The lookup runs through
+`functions/api/mal-list.js`, a small Cloudflare Function, because MyAnimeList's
+API sends no CORS headers and so cannot be called from a page directly. It is
+the only server-side code on the site, and `public/_routes.json` keeps it off
+every other request. `public/json/mal-index.json` maps MAL ids to wall
+positions; the shader reads a status byte per cell.
+
 ## How it works
 
 - **Engine** - the voronoi seeds come from a grid-constrained force simulation running across web workers on `SharedArrayBuffer`, drawn with WebGL2 (OGL and GLSL). That is why the site needs cross-origin isolation headers (`public/_headers`).
@@ -51,6 +65,7 @@ A fresh clone includes a **sample**: the 216 most popular titles, one atlas page
 | Command | Description |
 |---|---|
 | `pnpm dev` | Dev server on port 3000 |
+| `pnpm dev:api` | Runs the MAL relay locally on port 8788 (port 3000 forwards `/api` to it) |
 | `pnpm build` | Typecheck and production build |
 | `pnpm run test` | Unit tests (Vitest) |
 | `pnpm test:e2e` | End-to-end tests (Playwright) |
@@ -71,6 +86,7 @@ pnpm anime:mal          # MAL details for titles Kitsu lacks         (~1-2 h)
 pnpm anime:order        # merge, group franchises, order, cut chunks (instant)
 pnpm anime:posters      # download one poster per title              (~20 min, ~1 GB)
 pnpm anime:atlases      # pack atlases and poster sheets             (~5 min)
+pnpm anime:index        # MAL id -> wall position lookup        (instant)
 pnpm anime:check        # title data and textures agree
 ```
 
@@ -88,8 +104,13 @@ The site is static and hosted on Cloudflare Pages' free plan, uploaded from the 
 
 ```bash
 pnpm wrangler login     # once - browser sign-in
+pnpm wrangler pages secret put MAL_CLIENT_ID --project-name=plan-to-watch
 pnpm run deploy         # build, check the file count, upload
 ```
+
+The secret is the MyAnimeList client id the relay uses; without it the list
+lookup answers "not configured" and the rest of the site is unaffected. For
+local runs `pnpm dev:api` reads the same id from `.dev.vars`.
 
 Deploy from your machine rather than a git-triggered build: the generated media is not in the repository, so a build on Cloudflare or Netlify would produce a wall without posters. Later deploys upload only changed files. Details and the post-deploy checklist are in [docs/deploy.md](docs/deploy.md).
 

@@ -45,11 +45,15 @@ and no titles.
 1. `crossOriginIsolated` is `true` in the console. If it is false the workers
    run on copied buffers and the wall renders but never moves. The headers come
    from `public/_headers` alone - `require-corp`, which Safari supports too.
-   There is deliberately no Pages Function: one would run on every media
-   request and count against the Workers free plan's 100,000 requests a day.
+   The only Pages Function is the MAL relay, and `public/_routes.json` scopes
+   Functions to `/api/*` - otherwise one would run on every media request and
+   count against the Workers free plan's 100,000 requests a day.
 2. A poster sheet loads (`/media/poster-sheets/0.jpg`) and the detail panel
    shows the right poster for the right title.
 3. The wall itself draws - that is `/media/{low,mid,high}/dds/*.dds`.
+4. `/api/mal-list?user=<name>` answers with statuses. If it says
+   `not_configured`, set the secret:
+   `pnpm wrangler pages secret put MAL_CLIENT_ID --project-name=plan-to-watch`.
 
 ## Refreshing the data
 

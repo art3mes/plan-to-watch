@@ -101,6 +101,11 @@ uniform highp usampler2D uCellNeighborsAltTexture;
 uniform highp sampler2D uCellWeightsTexture;
 uniform highp usampler2D uCellMediaVersionsTexture;
 uniform highp usampler2D uCellIdMapTexture;
+// List overlay: one status byte per wall position (0 = not on the list).
+// Filled by app/vf/utils/list-overlay.ts when a MyAnimeList profile is loaded.
+uniform highp usampler2D uCellListStatusTexture;
+uniform float fListTintStrength;
+uniform float fListDimStrength;
 
 uniform mediump sampler2DArray uMediaV0Texture;
 uniform mediump sampler2DArray uMediaV1Texture;
@@ -169,6 +174,7 @@ struct Plot {
     float bulgeFactor;
     float mediaBulgeFactor;
     bool debugFlag;
+    float borderThickness;
 };
 
 const vec3 GRAYSCALE_LUMCOEFF = vec3(0.2125, 0.7154, 0.0721);
@@ -537,6 +543,49 @@ uint cellIdMapTexData(uint index) {
     int iIndex = int(index);
     int textureWidth = textureSize(uCellIdMapTexture, 0).x;
     return texelFetch(uCellIdMapTexture, ivec2(iIndex % textureWidth, iIndex / textureWidth), 0).r;
+}
+
+uint listStatusTexData(int id) {
+    int textureWidth = textureSize(uCellListStatusTexture, 0).x;
+    if (textureWidth <= 1) return 0u;
+    return texelFetch(uCellListStatusTexture, ivec2(id % textureWidth, id / textureWidth), 0).r;
+}
+
+vec3 listStatusColor(uint status) {
+    if (status == 1u) return vec3(1.0, 0.76, 0.24);  // completed - gold
+    if (status == 2u) return vec3(0.29, 0.75, 1.0);  // watching - blue
+    if (status == 3u) return vec3(0.96, 0.9, 0.35);  // on hold - yellow
+    if (status == 4u) return vec3(0.96, 0.31, 0.31); // dropped - red
+    return vec3(0.68, 0.56, 0.98);                   // plan to watch - violet
+}
+
+// Draws the list status as a lit rim just inside the cell border, plus a soft
+// glow falling inward, so the poster itself keeps its own colours. Widths are
+// multiples of the border thickness, which is what the edge distance is
+// measured against.
+void listOverlayColor(inout vec3 c, in Plot plot) {
+    if (fListTintStrength <= 0.001 && fListDimStrength <= 0.001) return;
+
+    int id = int(cellIdMapTexData(plot.indices.x));
+    uint status = listStatusTexData(id);
+
+    if (status == 0u) {
+        c = mix(c, c * 0.1, fListDimStrength);
+        return;
+    }
+
+    vec3 color = listStatusColor(status);
+    float d = plot.edge.x;
+    float t = max(plot.borderThickness, 0.0001);
+
+    float rim = (1. - smoothstep(t * 0.9, t * 1.8, d)) * plot.edgeStep;
+    float glow = exp(-max(d - t * 1.8, 0.) / (t * 3.5)) * plot.edgeStep;
+    // Slow shimmer, offset per cell so the wall does not pulse in unison.
+    float shine = 0.88 + 0.12 * sin(iTime * 1.6 + float(id) * 0.7);
+
+    vec3 rimColor = mix(color, vec3(1.), 0.3);
+    c = mix(c, rimColor, clamp(rim * shine, 0., 1.) * fListTintStrength);
+    c += color * glow * 0.16 * shine * fListTintStrength;
 }
 
 uvec2 mediaVersionTexData(uint index) {
@@ -1217,7 +1266,7 @@ Plot init(vec2 p) {
         indices.x = (row-1u) * uint(iLatticeCols) + col;
     }
 
-    return Plot(indices, uvec4(uint(-1)), vec2(0.), 0., vec2(0.), 0., 0., 1., 1., false);
+    return Plot(indices, uvec4(uint(-1)), vec2(0.), 0., vec2(0.), 0., 0., 1., 1., false, 0.);
 }
 
 void calcIndices(inout uvec4 indices, inout uvec4 indices2, inout uint neighborsPosition, in vec2 p, in uint index, in float weightOffsetScale, in float prevMaxWeight, in float bulgeFactor) {
@@ -1362,7 +1411,7 @@ Plot plot() {
     calcEdge(indices, indices2, cellCoords.xy, p, edge, weight, weightOffset, weightOffsetScale, borderRoundness, bulgeFactor);
     float edgeStep = smoothstep(edgeStepStart, edgeStepEnd, edge.x);
 
-    return Plot(indices, indices2, edge, edgeStep, mediaUv, cellScale, weight, bulgeFactor, mediaBulgeFactor, debugFlag);
+    return Plot(indices, indices2, edge, edgeStep, mediaUv, cellScale, weight, bulgeFactor, mediaBulgeFactor, debugFlag, borderThickness);
 }
 
 #if EDGES_VISIBLE == 1
@@ -1421,5 +1470,6 @@ void main() {
     #if EDGES_VISIBLE == 1
         edgesColor(c, a, plot);
     #endif
+    listOverlayColor(c, plot);
     colorOutput(c, a, plot);
 }

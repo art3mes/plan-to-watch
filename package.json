@@ -8,6 +8,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite --port 3000 --host 0.0.0.0",
+		"dev:api": "wrangler pages dev public --port 8788 --compatibility-date=2026-09-12",
 		"build": "tsc -b && vite build",
 		"analyze": "vite build --mode analyze",
 		"preview": "vite preview --port 3000 --host 0.0.0.0",
@@ -33,6 +34,7 @@
 		"anime:atlases": "node scripts/anime/07-build-atlases.mjs",
 		"seo:sitemap": "node scripts/generate-sitemap.js",
 		"seo:validate": "echo '🔍 SEO Validation:' && echo '📄 robots.txt:' && cat public/robots.txt && echo '\\n🗺️  sitemap.xml exists:' && ls -la public/sitemap.xml",
+		"anime:index": "node scripts/anime/08-build-mal-index.mjs",
 		"anime:check": "node scripts/anime/check-alignment.mjs",
 		"deploy": "pnpm build && node scripts/check-dist.mjs && wrangler pages deploy dist --project-name=plan-to-watch"
 	},

@@ -15,6 +15,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { createHash } from 'node:crypto'
+import { writeMalIndex } from './mal-index.mjs'
 import { ndjsonRead, readCatalog, root } from './lib.mjs'
 
 const CHUNK_SIZE = 216 // one high-res atlas page, and one json chunk
@@ -240,6 +241,9 @@ writeFileSync(
   resolve(OUT_JSON_DIR, 'manifest.json'),
   JSON.stringify({ fingerprint, count: ordered.length, chunkSize: CHUNK_SIZE }),
 )
+
+// MAL id -> wall position, for the list overlay (see scripts/anime/mal-index.mjs)
+writeMalIndex(OUT_JSON_DIR, { fingerprint, ids: ordered.map((r) => Number(r.ids.mal) || 0) })
 
 // --- report -----------------------------------------------------------------
 

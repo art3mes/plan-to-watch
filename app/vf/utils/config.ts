@@ -24,6 +24,9 @@ export type UserConfig = {
   cells?: number
   devTools?: boolean
   customLinks?: CustomLink[]
+  // Remembered so the wall comes back marked on the next visit.
+  malUsername?: string
+  listDimOthers?: boolean
   favorites?: {
     // Keyed by provider id (see favoriteKey), not by wall position: rebuilding
     // the data reshuffles positions and would otherwise orphan every favourite.

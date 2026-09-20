@@ -1,4 +1,4 @@
-import { GithubIcon, Heart, Info, Settings } from 'lucide-react'
+import { GithubIcon, Heart, Info, ListChecks, Settings } from 'lucide-react'
 
 import { useShallowState } from '@/store'
 import config from '../../config'
@@ -15,6 +15,8 @@ export const Navbar = () => {
     toggleAboutOpen,
     favoritesOpen,
     toggleFavoritesOpen,
+    listOpen,
+    toggleListOpen,
     hasFavorites,
     canChangeTheme,
   } = useShallowState((state) => ({
@@ -24,6 +26,8 @@ export const Navbar = () => {
     toggleAboutOpen: state.toggleAboutOpen,
     favoritesOpen: state.favoritesOpen,
     toggleFavoritesOpen: state.toggleFavoritesOpen,
+    listOpen: state.listOpen,
+    toggleListOpen: state.toggleListOpen,
     hasFavorites:
       state.userConfig.favorites &&
       Object.keys(state.userConfig.favorites).length > 0,
@@ -69,6 +73,22 @@ export const Navbar = () => {
           })}
         >
           <Settings />
+        </Button>
+        <Button
+          variant='ghost'
+          size='icon'
+          onClick={toggleListOpen}
+          onPointerDown={(event) => {
+            if (listOpen) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+          }}
+          className={cn(buttonClassnames, {
+            'border border-foreground': listOpen,
+          })}
+        >
+          <ListChecks />
         </Button>
         {hasFavorites && (
           <Button

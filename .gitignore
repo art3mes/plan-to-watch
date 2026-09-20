@@ -51,3 +51,6 @@ public/tmp.webm
 
 # Local build and deploy leftovers
 .wrangler/
+
+# Local secrets for `wrangler pages dev`
+.dev.vars

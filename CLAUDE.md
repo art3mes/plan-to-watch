@@ -8,7 +8,7 @@ Guidance for Claude Code (claude.ai/code) working in this repository.
 
 ## Ground rules
 
-- **No features upstream does not have.** Swap data, text, credits and branding; do not add new UI. A search feature was proposed and explicitly rejected on these grounds.
+- **Parity with upstream is no longer a rule.** It was, up to the list overlay ("we don't need to adhere to the existing repo rules... it's ours now", 2026-09-20). New UI is fair game; keep it in the existing visual language.
 - **Ecchi, Chinese and Korean titles stay in.** The only content filter is hentai.
 - **Non-commercial only** - the shaders are CC BY-NC-SA 3.0 and MyAnimeList's API licence agrees.
 - Upstream's MIT copyright line stays in `LICENSE`; additions go alongside it.
@@ -17,7 +17,8 @@ Guidance for Claude Code (claude.ai/code) working in this repository.
 
 Use **pnpm**. bun is not installed and the project no longer carries a `bun.lock`.
 
-- `pnpm dev` - dev server on port 3000
+- `pnpm dev` - dev server on port 3000 (forwards `/api` to port 8788)
+- `pnpm dev:api` - the MAL relay under `wrangler pages dev`, reading `MAL_CLIENT_ID` from `.dev.vars`
 - `pnpm build` - `tsc -b` then vite build
 - `pnpm check` - Biome lint and format
 - `pnpm run test` - unit tests (Vitest)
@@ -45,6 +46,7 @@ Run in order; each crawl is resumable and skips what it already has.
 | `pnpm anime:order` | merge, group franchises, order, cut json chunks | instant |
 | `pnpm anime:posters` | one poster per title into `data/raw/posters/` | ~20 min, ~1 GB |
 | `pnpm anime:atlases` | pack and compress atlases into `public/media/` | ~5 min |
+| `pnpm anime:index` | MAL id -> wall position lookup (step 5 writes it too) | instant |
 
 Sources: **Kitsu** (primary, no key), **MyAnimeList** (needs `MAL_CLIENT_ID` in `.env.local`), **manami-project/anime-offline-database** (catalogue backbone and ID cross-referencing). **AniList is deliberately unused** - its terms forbid mass collection of media data.
 
@@ -58,6 +60,15 @@ Key invariants:
 - The focused cell's full-resolution layer (`VITE_EXPERIMENTAL_MEDIA_VERSION_3_ENABLED`) reads the same sheets. Upstream loaded one image per title and packed them into 9x6 virtual GPU layers; with `cols: 9, rows: 6` in its media config the engine's layer index becomes the sheet number, and `VirtualMediaGridArrayTexture` uploads a whole sheet when `sheets: true`. Turning this layer off makes the selected poster a stretched 110x165 DXT1 tile - visibly blocky, so keep it on.
 - `pnpm anime:atlases --sheets-only` rebuilds sheets without re-encoding the 105 atlas layers.
 - The repo commits a sample so a fresh clone runs: `public/json/0.json`, page `0` of each atlas level and poster sheets `0-3`, matched by the layer counts in `.env.local.example` (1/1/1/4). A data rebuild changes these files - commit them together or the sample drifts out of step.
+
+### List overlay
+
+A visitor's MyAnimeList profile is marked on the wall:
+
+- `functions/api/mal-list.js` fetches the profile server-side - MAL answers any public list with just a client id but sends no CORS headers. It is the **only** Pages Function; `public/_routes.json` limits Functions to `/api/*` so media and data stay free static hits (the Workers free plan allows 100k requests a day).
+- `public/json/mal-index.json` (committed, ~116 KB) holds the MAL id at each wall position, stamped with the order fingerprint.
+- `app/vf/utils/list-overlay.ts` turns the statuses into one byte per position and uploads them as an R8UI texture; `listOverlayColor()` in `main.frag` draws the rim, the glow and the fade. Status codes must stay in step across the relay, the module and the shader.
+- Rim and glow widths are multiples of `plot.borderThickness` (added to the `Plot` struct). Both `Plot(...)` constructor calls must carry the same field count.
 
 ### Texture encoding
 
