@@ -22,9 +22,11 @@ An anime fork of [gnovotny/nothing-to-watch](https://github.com/gnovotny/nothing
 ## Marking your own list
 
 Enter a public MyAnimeList username (the checklist icon, top right) and every
-title on that profile is marked on the wall: a lit rim around the cell, gold for
-completed, blue for watching, yellow for on hold, red for dropped, violet for
-plan to watch. A switch fades everything else so only your list stays lit.
+title on that profile is marked on the wall with a lit rim around the cell:
+amber for completed, blue for watching, lime for on hold, red for dropped,
+violet for plan to watch. A switch fades everything else so only your list
+stays lit. Titles beyond the wall size you picked are counted separately, so
+the panel tells you when raising it would show more.
 
 The username lives in your browser only. The lookup runs through
 `functions/api/mal-list.js`, a small Cloudflare Function, because MyAnimeList's
@@ -37,7 +39,7 @@ positions; the shader reads a status byte per cell.
 
 - **Engine** - the voronoi seeds come from a grid-constrained force simulation running across web workers on `SharedArrayBuffer`, drawn with WebGL2 (OGL and GLSL). That is why the site needs cross-origin isolation headers (`public/_headers`).
 - **Textures** - posters are packed into compressed atlases at three zoom levels (DXT1 for desktop GPUs, ETC for phones), and the focused cell swaps in a full-resolution poster.
-- **Poster sheets** - full-size posters are packed 9x6 into 398 sheets instead of 21,472 files, which keeps the whole site (~790 MB, 733 files) under Cloudflare Pages' free-plan file limit. The detail panel crops its poster out of the same sheet.
+- **Poster sheets** - full-size posters are packed 9x6 into 398 sheets instead of 21,472 files, which keeps the whole site (~790 MB, 735 files) under Cloudflare Pages' free-plan file limit. The detail panel crops its poster out of the same sheet.
 - **No backend** - every title, synopsis and poster is baked into static files at build time. The live site never calls MyAnimeList or Kitsu.
 
 ## Data sources
@@ -59,6 +61,9 @@ pnpm install
 cp .env.local.example .env.local
 pnpm dev                # http://localhost:3000
 ```
+
+To exercise the list lookup locally, put the same `MAL_CLIENT_ID` line in a
+`.dev.vars` file (gitignored) and run `pnpm dev:api` alongside `pnpm dev`.
 
 A fresh clone includes a **sample**: the 216 most popular titles, one atlas page per zoom level and four poster sheets, repeated across the wall. The full 21,474-title data is generated, not committed - build it as below.
 
@@ -86,7 +91,7 @@ pnpm anime:mal          # MAL details for titles Kitsu lacks         (~1-2 h)
 pnpm anime:order        # merge, group franchises, order, cut chunks (instant)
 pnpm anime:posters      # download one poster per title              (~20 min, ~1 GB)
 pnpm anime:atlases      # pack atlases and poster sheets             (~5 min)
-pnpm anime:index        # MAL id -> wall position lookup        (instant)
+pnpm anime:index        # MAL id -> wall position lookup           (instant)
 pnpm anime:check        # title data and textures agree
 ```
 
@@ -100,7 +105,9 @@ The engine wants DXT1 inside DDS for desktop GPUs and ETC inside KTX for phones.
 
 ## Deploying
 
-The site is static and hosted on Cloudflare Pages' free plan, uploaded from the machine that built the data:
+Cloudflare Pages' free plan, uploaded from the machine that built the data.
+Everything is a static file except `functions/api/mal-list.js`, which only runs
+when someone looks up a username:
 
 ```bash
 pnpm wrangler login     # once - browser sign-in
