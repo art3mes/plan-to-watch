@@ -30,9 +30,9 @@ export type ListStatusMeta = {
 
 // Colours mirror listStatusColor() in the shader.
 export const LIST_STATUS_META: ListStatusMeta[] = [
-  { code: LIST_STATUS.completed, label: 'Completed', color: '#ffc23d' },
+  { code: LIST_STATUS.completed, label: 'Completed', color: '#ffab1c' },
   { code: LIST_STATUS.watching, label: 'Watching', color: '#4ac0ff' },
-  { code: LIST_STATUS.onHold, label: 'On hold', color: '#f5e559' },
+  { code: LIST_STATUS.onHold, label: 'On hold', color: '#d9ff59' },
   { code: LIST_STATUS.dropped, label: 'Dropped', color: '#f54f4f' },
   { code: LIST_STATUS.planToWatch, label: 'Plan to watch', color: '#ae8ffa' },
 ]

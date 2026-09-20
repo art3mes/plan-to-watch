@@ -552,9 +552,9 @@ uint listStatusTexData(int id) {
 }
 
 vec3 listStatusColor(uint status) {
-    if (status == 1u) return vec3(1.0, 0.76, 0.24);  // completed - gold
+    if (status == 1u) return vec3(1.0, 0.67, 0.11);  // completed - amber gold
     if (status == 2u) return vec3(0.29, 0.75, 1.0);  // watching - blue
-    if (status == 3u) return vec3(0.96, 0.9, 0.35);  // on hold - yellow
+    if (status == 3u) return vec3(0.85, 1.0, 0.35);  // on hold - lime yellow
     if (status == 4u) return vec3(0.96, 0.31, 0.31); // dropped - red
     return vec3(0.68, 0.56, 0.98);                   // plan to watch - violet
 }
