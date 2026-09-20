@@ -559,10 +559,10 @@ vec3 listStatusColor(uint status) {
     return vec3(0.68, 0.56, 0.98);                   // plan to watch - violet
 }
 
-// Draws the list status as a lit rim just inside the cell border, plus a soft
-// glow falling inward, so the poster itself keeps its own colours. Widths are
-// multiples of the border thickness, which is what the edge distance is
-// measured against.
+// Marks a cell with its list status: a lit rim on the cell border with a light
+// that travels around it, and a short glow falling inward. Nothing is painted
+// over the poster - the Depth preset rebuilds the border from its own height
+// map, so post-depth.frag colours that bezel instead (same status texture).
 void listOverlayColor(inout vec3 c, in Plot plot) {
     if (fListTintStrength <= 0.001 && fListDimStrength <= 0.001) return;
 
@@ -578,14 +578,16 @@ void listOverlayColor(inout vec3 c, in Plot plot) {
     float d = plot.edge.x;
     float t = max(plot.borderThickness, 0.0001);
 
-    float rim = (1. - smoothstep(t * 0.9, t * 1.8, d)) * plot.edgeStep;
-    float glow = exp(-max(d - t * 1.8, 0.) / (t * 3.5)) * plot.edgeStep;
-    // Slow shimmer, offset per cell so the wall does not pulse in unison.
-    float shine = 0.88 + 0.12 * sin(iTime * 1.6 + float(id) * 0.7);
+    float rim = (1. - smoothstep(t * 0.9, t * 2., d)) * plot.edgeStep;
+    float glow = exp(-max(d - t * 2., 0.) / (t * 3.)) * plot.edgeStep;
 
-    vec3 rimColor = mix(color, vec3(1.), 0.3);
-    c = mix(c, rimColor, clamp(rim * shine, 0., 1.) * fListTintStrength);
-    c += color * glow * 0.16 * shine * fListTintStrength;
+    // A highlight that travels around the cell, each one on its own phase.
+    vec2 v = plot.mediaUv - 0.5;
+    float sweep = pow(max(sin(atan(v.y, v.x) - iTime * 1.1 + float(id) * 0.6), 0.), 6.);
+
+    vec3 rimColor = mix(color, vec3(1.), 0.25 + 0.45 * sweep);
+    c = mix(c, rimColor, clamp(rim, 0., 1.) * fListTintStrength);
+    c += color * glow * (0.12 + 0.12 * sweep) * fListTintStrength;
 }
 
 uvec2 mediaVersionTexData(uint index) {

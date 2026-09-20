@@ -107,7 +107,9 @@ export const createListOverlay = (
   const scene = instance.display?.scene as
     | {
         gl?: OGLRenderingContext
+        cellIdsTexture?: unknown
         mainProgram?: { uniforms: Record<string, { value: unknown }> }
+        postProgram?: { uniforms: Record<string, { value: unknown }> }
       }
     | undefined
   const gl = scene?.gl
@@ -140,6 +142,15 @@ export const createListOverlay = (
   uniforms.fListTintStrength = { value: 0 }
   uniforms.fListDimStrength = { value: 0 }
 
+  // The Depth preset rebuilds the area around each cell in its post shader and
+  // colours the bezel there, so it needs the same lookups.
+  const postUniforms = scene?.postProgram?.uniforms
+  if (postUniforms) {
+    postUniforms.uCellListStatusTexture = { value: texture }
+    postUniforms.uCellIdMapTexture = { value: scene?.cellIdsTexture }
+    postUniforms.fListTintStrength = { value: 0 }
+  }
+
   return {
     cellCount,
     setStatusBytes: (bytes?: Uint8Array) => {
@@ -149,6 +160,9 @@ export const createListOverlay = (
     setStrength: (tint: number, dim: number) => {
       uniforms.fListTintStrength.value = tint
       uniforms.fListDimStrength.value = dim
+      if (postUniforms?.fListTintStrength) {
+        postUniforms.fListTintStrength.value = tint
+      }
     },
   }
 }

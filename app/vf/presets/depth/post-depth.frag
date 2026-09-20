@@ -7,6 +7,13 @@ uniform highp sampler2D uMainOutputTexture;
 uniform highp sampler2D uVoroEdgeBufferTexture;
 uniform highp sampler2D uVoroIndexBufferTexture;
 
+// List overlay: this preset rebuilds the area around each cell from its own
+// height map, so a rim drawn in main.frag never survives here. Instead the
+// bezel itself takes the status colour and the lighting does the rest.
+uniform highp usampler2D uCellIdMapTexture;
+uniform highp usampler2D uCellListStatusTexture;
+uniform float fListTintStrength;
+
 uniform vec3 iResolution;
 uniform float iTime;
 uniform vec2 fCenterForce;
@@ -27,6 +34,30 @@ float hmGlobal;
 
 vec4 fetchIndices(vec2 uv) {
     return texelFetch(uVoroIndexBufferTexture, ivec2(uv*iResolution.xy), 0);
+}
+
+vec3 listStatusColor(uint status) {
+    if (status == 1u) return vec3(1.0, 0.67, 0.11);  // completed - amber gold
+    if (status == 2u) return vec3(0.29, 0.75, 1.0);  // watching - blue
+    if (status == 3u) return vec3(0.85, 1.0, 0.35);  // on hold - lime yellow
+    if (status == 4u) return vec3(0.96, 0.31, 0.31); // dropped - red
+    return vec3(0.68, 0.56, 0.98);                   // plan to watch - violet
+}
+
+// Status of the cell under this uv, 0 when it is not on the list.
+uint listStatusAt(vec2 uv) {
+    if (fListTintStrength <= 0.001) return 0u;
+
+    uint packed = floatBitsToUint(texelFetch(uVoroIndexBufferTexture, ivec2(uv * iResolution.xy), 0).r);
+    if (packed == 0u) return 0u;
+    int index = int(packed - 1u);
+
+    int idWidth = textureSize(uCellIdMapTexture, 0).x;
+    int id = int(texelFetch(uCellIdMapTexture, ivec2(index % idWidth, index / idWidth), 0).r);
+
+    int statusWidth = textureSize(uCellListStatusTexture, 0).x;
+    if (statusWidth <= 1) return 0u;
+    return texelFetch(uCellListStatusTexture, ivec2(id % statusWidth, id / statusWidth), 0).r;
 }
 
 vec2 rawCoords(in vec2 screenCoords) {
@@ -211,6 +242,12 @@ void main(){
     vec3 c = vec3(0);
     vec2 uv = pToUv(p);
     vec3 fCol = vec3(0.05);
+    // A marked cell lifts its bezel to the status colour; the existing
+    // specular and fresnel passes below then light it like any other surface.
+    uint listStatus = listStatusAt(uv);
+    if (listStatus > 0u) {
+        fCol = mix(fCol, listStatusColor(listStatus) * 0.32, fListTintStrength);
+    }
     vec3 mCol;
     if (svObjID > 0.) {
         mCol = texture(uMainOutputTexture, uv).rgb;
@@ -236,6 +273,12 @@ void main(){
     c += c*vec3(0, .3, 1)*fres*5.*rmMod*rmMod*rmMod;
     #endif
 
+
+    if (listStatus > 0u && svObjID < 1.) {
+        // Rim light along the raised edge, brightest where it faces the camera.
+        float fres = pow(max(1. - max(dot(-r, n), 0.), 0.), 3.);
+        c += listStatusColor(listStatus) * fres * 1.6 * fListTintStrength;
+    }
 
     // Sspecular reflections
     vec3 hv = normalize(-r + l);
