@@ -96,7 +96,7 @@ export const MyList = () => {
                 autoComplete='off'
                 autoCapitalize='off'
                 spellCheck={false}
-                placeholder='e.g. art3mes'
+                placeholder='e.g. Xinil'
                 onChange={(event) => setUsername(event.target.value)}
               />
               <Button type='submit' disabled={loading || !username.trim()}>
